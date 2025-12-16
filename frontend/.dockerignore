@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+bun.lockb
+
+# Build outputs
+dist/
+dist-ssr/
+
+# Git
+.git/
+.gitignore
+
+# Testing
+playwright-report/
+test-results/
+e2e/
+
+# Logs
+*.log
+npm-debug.log*
+bun-debug.log*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Documentation
+README.md
+CLAUDE.md
+
+# TypeScript
+*.tsbuildinfo
+node_modules/.tmp/
