@@ -1,4 +1,4 @@
-import VacancyList from '../../components/VacancyList';
+import VacancyList from "../../components/VacancyList/VacancyList";
 
 const HomePage = () => {
   return (

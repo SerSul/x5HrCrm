@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, Text, Button, TextInput, TextArea } from '@gravity-ui/uikit';
 import { useAuthStore } from '../../storage/authStorage';
-import './ProfilePage.css';
+import styles from './ProfilePage.module.scss';
 
 const ProfilePage = () => {
   const user = useAuthStore((state) => state.user);
@@ -28,33 +28,33 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="profile-page">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>My Profile</h1>
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>My Profile</h1>
         {user.role === 'candidate' && !isEditing && (
           <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
         )}
       </div>
-      <Card className="profile-card">
-        <div className="profile-field">
+      <Card className={styles.card}>
+        <div className={styles.field}>
           <Text variant="subheader-1" color="secondary">Name</Text>
           <Text variant="body-2">{user.name}</Text>
         </div>
-        <div className="profile-field">
+        <div className={styles.field}>
           <Text variant="subheader-1" color="secondary">Email</Text>
           <Text variant="body-2">{user.email}</Text>
         </div>
-        <div className="profile-field">
+        <div className={styles.field}>
           <Text variant="subheader-1" color="secondary">Phone</Text>
           <Text variant="body-2">{user.phone}</Text>
         </div>
-        <div className="profile-field">
+        <div className={styles.field}>
           <Text variant="subheader-1" color="secondary">Role</Text>
           <Text variant="body-2">{user.role === 'candidate' ? 'Candidate' : 'Recruiter'}</Text>
         </div>
         {user.role === 'candidate' && (
           <>
-            <div className="profile-field">
+            <div className={styles.field}>
               <Text variant="subheader-1" color="secondary">Experience</Text>
               {isEditing ? (
                 <TextArea
@@ -67,7 +67,7 @@ const ProfilePage = () => {
                 <Text variant="body-2">{user.experience || 'Not provided'}</Text>
               )}
             </div>
-            <div className="profile-field">
+            <div className={styles.field}>
               <Text variant="subheader-1" color="secondary">Skills</Text>
               {isEditing ? (
                 <TextInput
@@ -82,7 +82,7 @@ const ProfilePage = () => {
           </>
         )}
         {isEditing && (
-          <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+          <div className={styles.actions}>
             <Button view="action" onClick={handleSave}>Save</Button>
             <Button onClick={handleCancel}>Cancel</Button>
           </div>

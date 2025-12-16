@@ -4,6 +4,7 @@ import { Spin, Card, Button } from '@gravity-ui/uikit';
 import { fetchVacancyByIdRequest } from '../../api/vacancyApi';
 import { useApplicationStore } from '../../storage/applicationStorage';
 import type { Vacancy } from '../../api/vacancyApi';
+import styles from './VacancyDetailPage.module.scss';
 
 const VacancyDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -49,20 +50,20 @@ const VacancyDetailPage = () => {
   return (
     <div>
       <h1>{vacancy.title}</h1>
-      <Card style={{ padding: '24px', marginTop: '16px' }}>
-        <div style={{ marginBottom: '16px' }}>
+      <Card className={styles.card}>
+        <div className={styles.details}>
           <p><strong>Company:</strong> {vacancy.company}</p>
           <p><strong>Location:</strong> {vacancy.location}</p>
           <p><strong>Type:</strong> {vacancy.type}</p>
           <p><strong>Salary:</strong> {vacancy.salary}</p>
         </div>
-        <div style={{ marginTop: '24px' }}>
+        <div className={styles.description}>
           <h3>Job Description</h3>
           <p>{vacancy.description}</p>
         </div>
-        <div style={{ marginTop: '24px' }}>
+        <div className={styles.applySection}>
           {hasApplied ? (
-            <p style={{ color: 'green' }}>You have already applied to this position</p>
+            <p className={styles.appliedMessage}>You have already applied to this position</p>
           ) : (
             <Button size="l" view="action" onClick={handleApply}>
               Apply Now

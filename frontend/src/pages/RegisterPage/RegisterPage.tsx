@@ -1,7 +1,9 @@
-import { Button, TextInput } from '@gravity-ui/uikit';
+import { Button, Card, TextInput } from '@gravity-ui/uikit';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { useAuthStore } from '../../storage/authStorage';
+import Link from '../../components/Link/Link';
+import styles from './RegisterPage.module.scss';
 
 const RegisterPage = () => {
   const [login, setLogin] = useState('');
@@ -22,22 +24,59 @@ const RegisterPage = () => {
   };
 
   return (
-    <div>
-      <h1>Register</h1>
-      <form onSubmit={handleSubmit}>
-        <TextInput value={login} onChange={(e) => setLogin(e.target.value)} placeholder="Login" />
-        <TextInput value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Password" />
-        <TextInput value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Email" />
-        <TextInput value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" placeholder="Phone" />
-        <Button type="submit">Register</Button>
-        {user && <p>Success</p>}
-      </form>
-      <p>
-        Are you a recruiter? <Link to="/register/recruiter">Register here</Link>
-      </p>
-      <p>
-        Already have an account? <Link to="/login">Login here</Link>
-      </p>
+    <div className={styles.page}>
+      <div className={styles.container}>
+        <Card className={styles.card}>
+          <h1 className={styles.title}>Register</h1>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.field}>
+              <TextInput
+                value={login}
+                onChange={(e) => setLogin(e.target.value)}
+                placeholder="Login"
+              />
+            </div>
+            <div className={styles.field}>
+              <TextInput
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type="password"
+                placeholder="Password"
+              />
+            </div>
+            <div className={styles.field}>
+              <TextInput
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                placeholder="Email"
+              />
+            </div>
+            <div className={styles.field}>
+              <TextInput
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                type="tel"
+                placeholder="Phone"
+              />
+            </div>
+            <div className={styles.actions}>
+              <Button type="submit" className={styles.submitButton}>
+                Register
+              </Button>
+            </div>
+            {user && <p className={styles.successMessage}>Successfully registered!</p>}
+          </form>
+          <div className={styles.footer}>
+            <p>
+              Are you a recruiter? <Link to="/register/recruiter" variant="inline">Register here</Link>
+            </p>
+            <p>
+              Already have an account? <Link to="/login" variant="inline">Login here</Link>
+            </p>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 };

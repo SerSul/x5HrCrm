@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router';
 import { Spin, Card } from '@gravity-ui/uikit';
 import { useCandidateStore } from '../../storage/candidateStorage';
+import styles from './CandidateDetailPage.module.scss';
 
 const CandidateDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,18 +29,18 @@ const CandidateDetailPage = () => {
   return (
     <div>
       <h1>Candidate Details</h1>
-      <Card style={{ padding: '24px' }}>
+      <Card className={styles.card}>
         <h2>{selectedCandidate.name}</h2>
-        <div style={{ marginTop: '16px' }}>
+        <div className={styles.contactInfo}>
           <p><strong>Email:</strong> {selectedCandidate.email}</p>
           <p><strong>Phone:</strong> {selectedCandidate.phone}</p>
           <p><strong>ID:</strong> {selectedCandidate.id}</p>
         </div>
-        <div style={{ marginTop: '24px' }}>
+        <div className={styles.experienceSection}>
           <h3>Experience</h3>
           <p>{selectedCandidate.experience}</p>
         </div>
-        <div style={{ marginTop: '24px' }}>
+        <div className={styles.skillsSection}>
           <h3>Skills</h3>
           <p>{selectedCandidate.skills}</p>
         </div>

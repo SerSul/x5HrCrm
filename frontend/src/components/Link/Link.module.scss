@@ -1,0 +1,57 @@
+.link {
+  text-decoration: none;
+  transition: all 0.2s ease;
+
+  &:focus-visible {
+    outline: 2px solid var(--g-color-line-brand);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+// Inline variant for auth forms and text content
+.inline {
+  color: var(--g-color-text-link);
+  font-weight: 500;
+
+  &:hover {
+    color: var(--g-color-text-link-hover);
+    text-decoration: underline;
+  }
+
+  &:visited {
+    color: var(--g-color-text-link-visited);
+  }
+
+  &:visited:hover {
+    color: var(--g-color-text-link-visited-hover);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// Nav variant for header navigation
+.nav {
+  color: var(--g-color-text-primary);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: var(--g-color-base-simple-hover);
+    color: var(--g-color-text-brand);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  @media (min-width: 640px) {
+    padding: 0.5rem 1rem;
+    font-size: 15px;
+  }
+}

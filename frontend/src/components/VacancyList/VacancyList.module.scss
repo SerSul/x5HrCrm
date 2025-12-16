@@ -1,0 +1,119 @@
+.container {
+  padding: 2rem 0;
+}
+
+.title {
+  margin-bottom: 2rem;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--g-color-text-primary);
+}
+
+.emptyState {
+  color: var(--g-color-text-secondary);
+  text-align: center;
+  padding: 3rem 0;
+  font-size: 16px;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.cardWrapper {
+  flex: 1 1 100%;
+  min-width: 0;
+
+  @media (min-width: 640px) {
+    flex-basis: calc(50% - 0.75rem);
+    max-width: calc(50% - 0.75rem);
+  }
+
+  @media (min-width: 1024px) {
+    flex-basis: calc(33.333% - 1rem);
+    max-width: calc(33.333% - 1rem);
+  }
+
+  @media (min-width: 1440px) {
+    flex-basis: calc(25% - 1.125rem);
+    max-width: calc(25% - 1.125rem);
+  }
+}
+
+.card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.cardContent {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.vacancyTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--g-color-text-primary);
+}
+
+.vacancyMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.metaItem {
+  font-size: 14px;
+  color: var(--g-color-text-secondary);
+
+  strong {
+    color: var(--g-color-text-primary);
+    margin-right: 0.25rem;
+  }
+}
+
+.description {
+  font-size: 14px;
+  color: var(--g-color-text-secondary);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cardActions {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--g-color-line-generic);
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.errorContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}

@@ -1,7 +1,8 @@
 import { Button } from '@gravity-ui/uikit';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { useAuthStore } from '../../storage/authStorage';
-import './Header.css';
+import Link from '../Link/Link';
+import styles from './Header.module.scss';
 
 const Header = () => {
   const user = useAuthStore((state) => state.user);
@@ -14,45 +15,45 @@ const Header = () => {
   };
 
   return (
-    <header className="header">
-      <nav className="header-nav">
-        <div className="header-left">
+    <header className={styles.header}>
+      <nav className={styles.nav}>
+        <div className={styles.navSection}>
           {user?.role === 'candidate' && (
             <>
-              <Link to="/candidate" className="header-link">
+              <Link to="/candidate" variant="nav">
                 Home
               </Link>
-              <Link to="/candidate/applications" className="header-link">
+              <Link to="/candidate/applications" variant="nav">
                 My Applications
               </Link>
             </>
           )}
           {user?.role === 'recruiter' && (
-            <Link to="/recruiter" className="header-link">
+            <Link to="/recruiter" variant="nav">
               Candidates
             </Link>
           )}
         </div>
-        <div className="header-right">
+        <div className={styles.navSection}>
           {user ? (
             <>
               <Link
                 to={user.role === 'candidate' ? '/candidate/profile' : '/recruiter/profile'}
-                className="header-link"
+                variant="nav"
               >
                 Profile
               </Link>
-              <span className="header-user">Welcome, {user.name}</span>
-              <Button view="flat" onClick={handleLogout}>
+              <span className={styles.userGreeting}>Welcome, {user.name}</span>
+              <Button view="flat" onClick={handleLogout} className={styles.logoutButton}>
                 Logout
               </Button>
             </>
           ) : (
             <>
-              <Link to="/login" className="header-link">
+              <Link to="/login" variant="nav">
                 Login
               </Link>
-              <Link to="/register" className="header-link">
+              <Link to="/register" variant="nav">
                 Register
               </Link>
             </>

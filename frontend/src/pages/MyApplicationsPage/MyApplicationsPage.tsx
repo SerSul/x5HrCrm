@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { Spin } from '@gravity-ui/uikit';
 import { useApplicationStore } from '../../storage/applicationStorage';
-import ApplicationCard from '../../components/ApplicationCard';
+import ApplicationCard from '../../components/ApplicationCard/ApplicationCard';
+import styles from './MyApplicationsPage.module.scss';
 
 const MyApplicationsPage = () => {
   const { applications, loading, error, fetchMyApplications } = useApplicationStore();
@@ -24,7 +25,7 @@ const MyApplicationsPage = () => {
       {applications.length === 0 ? (
         <p>You haven't applied to any positions yet.</p>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px' }}>
+        <div className={styles.applicationsList}>
           {applications.map((application) => (
             <ApplicationCard key={application.id} application={application} />
           ))}

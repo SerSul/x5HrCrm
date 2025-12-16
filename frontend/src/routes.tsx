@@ -12,13 +12,22 @@ import MyApplicationsPage from './pages/MyApplicationsPage/MyApplicationsPage';
 import VacancyApplicationsPage from './pages/VacancyApplicationsPage/VacancyApplicationsPage';
 import { useAuthStore } from './storage/authStorage';
 
-// Basic protected route loader - checks if user is logged in
-const protectedLoader = async () => {
+// Root path loader - redirects based on user role
+const rootLoader = async () => {
   const user = useAuthStore.getState().user;
-  if (!user) {
-    return redirect('/login');
+
+  // Unauthorized users and candidates go to vacancy list
+  if (!user || user.role === 'candidate') {
+    return redirect('/candidate');
   }
-  return null;
+
+  // Recruiters go to candidate list
+  if (user.role === 'recruiter') {
+    return redirect('/recruiter');
+  }
+
+  // Fallback for unexpected cases
+  return redirect('/candidate');
 };
 
 // Candidate-specific protected loader
@@ -50,6 +59,12 @@ export const router = createBrowserRouter([
     path: '/',
     element: <WithToolbarLayout />,
     children: [
+      // Root index route - redirects based on role
+      {
+        index: true,
+        loader: rootLoader,
+      },
+
       // Public routes
       {
         path: '/login',
@@ -64,10 +79,9 @@ export const router = createBrowserRouter([
         element: <RecruiterRegisterPage />,
       },
 
-      // Candidate routes (protected)
+      // Candidate routes (public vacancy browsing, protected personal features)
       {
         path: '/candidate',
-        loader: candidateProtectedLoader,
         children: [
           {
             index: true,
@@ -80,15 +94,17 @@ export const router = createBrowserRouter([
           {
             path: 'applications',
             element: <MyApplicationsPage />,
+            loader: candidateProtectedLoader,
           },
           {
             path: 'profile',
             element: <ProfilePage />,
+            loader: candidateProtectedLoader,
           },
         ],
       },
 
-      // Recruiter routes (protected) - FIXED typo from /recruter
+      // Recruiter routes (protected)
       {
         path: '/recruiter',
         loader: recruiterProtectedLoader,

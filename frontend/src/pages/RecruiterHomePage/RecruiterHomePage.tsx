@@ -1,4 +1,4 @@
-import CandidateList from '../../components/CandidateList';
+import CandidateList from '../../components/CandidateList/CandidateList';
 
 const RecruiterHomePage = () => {
   return (

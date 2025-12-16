@@ -1,6 +1,7 @@
 import { Card, Button } from '@gravity-ui/uikit';
-import ApplicationStatusBadge from './ApplicationStatusBadge';
-import type { Application } from '../api/applicationApi';
+import ApplicationStatusBadge from '../ApplicationStatusBadge/ApplicationStatusBadge';
+import type { Application } from '../../api/applicationApi';
+import styles from './ApplicationCard.module.scss';
 
 interface ApplicationCardProps {
   application: Application;
@@ -10,8 +11,8 @@ interface ApplicationCardProps {
 
 const ApplicationCard = ({ application, showActions = false, onStatusChange }: ApplicationCardProps) => {
   return (
-    <Card style={{ padding: '16px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+    <Card className={styles.card}>
+      <div className={styles.header}>
         <div>
           <h3>{application.vacancyTitle}</h3>
           <p><strong>Candidate:</strong> {application.candidateName}</p>
@@ -21,7 +22,7 @@ const ApplicationCard = ({ application, showActions = false, onStatusChange }: A
         <ApplicationStatusBadge status={application.status} />
       </div>
       {showActions && onStatusChange && application.status !== 'accepted' && application.status !== 'rejected' && (
-        <div style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
+        <div className={styles.actions}>
           {application.status === 'pending' && (
             <Button onClick={() => onStatusChange(application.id, 'reviewed')}>
               Mark as Reviewed
