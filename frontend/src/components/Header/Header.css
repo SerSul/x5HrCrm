@@ -1,0 +1,38 @@
+.header {
+  background-color: var(--g-color-base-background);
+  border-bottom: 1px solid var(--g-color-line-generic);
+  padding: 0 1rem;
+}
+
+.header-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-left,
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-link {
+  color: var(--g-color-text-primary);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.header-link:hover {
+  background-color: var(--g-color-base-simple-hover);
+}
+
+.header-user {
+  color: var(--g-color-text-secondary);
+  font-size: 14px;
+}
