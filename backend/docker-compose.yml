@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: hr-automatization-db
+    environment:
+      POSTGRES_DB: hr_automatization
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - hr-network
+
+volumes:
+  postgres_data:
+
+networks:
+  hr-network:
+    driver: bridge

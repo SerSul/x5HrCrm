@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="009-create-test-answers-table" author="laplas7">
+        <createTable tableName="test_answers">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="attempt_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="selected_option_id" type="BIGINT"/>
+            <column name="deleted_at" type="TIMESTAMP"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="test_answers"
+                baseColumnNames="attempt_id"
+                constraintName="fk_test_answers_attempt"
+                referencedTableName="test_attempts"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="test_answers"
+                baseColumnNames="selected_option_id"
+                constraintName="fk_test_answers_option"
+                referencedTableName="answer_options"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>
