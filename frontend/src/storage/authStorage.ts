@@ -7,6 +7,9 @@ interface User {
   name: string;
   email: string;
   phone: string;
+  role: 'candidate' | 'recruiter';
+  experience?: string;
+  skills?: string;
 }
 
 interface AuthState {
@@ -15,6 +18,7 @@ interface AuthState {
   register: (user: RegisterParams) => Promise<void>;
   login: (params: LoginParams) => Promise<void>;
   logout: () => void;
+  updateProfile: (data: Partial<User>) => void;
 }
 
 export const useAuthStore = create<AuthState>()((set) => ({
@@ -41,5 +45,10 @@ export const useAuthStore = create<AuthState>()((set) => ({
       user: null,
       token: null
     });
+  },
+  updateProfile: (data: Partial<User>) => {
+    set((state) => ({
+      user: state.user ? { ...state.user, ...data } : null,
+    }));
   },
 }));

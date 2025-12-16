@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
-import { Card, Spin } from '@gravity-ui/uikit';
+import { Card, Spin, Button } from '@gravity-ui/uikit';
+import { useNavigate } from 'react-router';
 import { useVacancyStore } from '../storage/vacancyStorage';
 
 const VacancyList = () => {
   const { vacancies, loading, error, fetchVacancies } = useVacancyStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchVacancies();
@@ -32,6 +34,11 @@ const VacancyList = () => {
               <p><strong>Type:</strong> {vacancy.type}</p>
               <p><strong>Salary:</strong> {vacancy.salary}</p>
               <p>{vacancy.description}</p>
+              <div style={{ marginTop: '12px' }}>
+                <Button onClick={() => navigate(`/candidate/vacancies/${vacancy.id}`)}>
+                  View Details & Apply
+                </Button>
+              </div>
             </Card>
           ))}
         </div>

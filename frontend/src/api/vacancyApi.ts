@@ -13,3 +13,7 @@ export interface Vacancy {
 export const fetchVacanciesRequest = async () => {
   return await api.get<Vacancy[]>('/vacancies');
 };
+
+export const fetchVacancyByIdRequest = async (id: string) => {
+  return await api.get<Vacancy>(`/vacancies/${id}`);
+};

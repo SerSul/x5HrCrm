@@ -17,14 +17,29 @@ const Header = () => {
     <header className="header">
       <nav className="header-nav">
         <div className="header-left">
-          <Link to="/" className="header-link">
-            Home
-          </Link>
+          {user?.role === 'candidate' && (
+            <>
+              <Link to="/candidate" className="header-link">
+                Home
+              </Link>
+              <Link to="/candidate/applications" className="header-link">
+                My Applications
+              </Link>
+            </>
+          )}
+          {user?.role === 'recruiter' && (
+            <Link to="/recruiter" className="header-link">
+              Candidates
+            </Link>
+          )}
         </div>
         <div className="header-right">
           {user ? (
             <>
-              <Link to="/profile" className="header-link">
+              <Link
+                to={user.role === 'candidate' ? '/candidate/profile' : '/recruiter/profile'}
+                className="header-link"
+              >
                 Profile
               </Link>
               <span className="header-user">Welcome, {user.name}</span>

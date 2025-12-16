@@ -10,3 +10,7 @@ export interface RegisterParams {
 export const registerRequest = async (params: RegisterParams) => {
   return await api.post('/register', params);
 };
+
+export const registerRecruiterRequest = async (params: RegisterParams) => {
+  return await api.post('/register/recruiter', params);
+};
