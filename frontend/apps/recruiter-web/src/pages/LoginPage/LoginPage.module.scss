@@ -1,0 +1,72 @@
+.page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 60px);
+  padding: 1rem;
+
+  @media (min-width: 640px) {
+    padding: 1.5rem;
+  }
+}
+
+.container {
+  width: 100%;
+  max-width: 420px;
+}
+
+.card {
+  padding: 1.5rem;
+
+  @media (min-width: 640px) {
+    padding: 2rem;
+  }
+}
+
+.title {
+  margin: 0 0 1.5rem 0;
+  color: var(--g-color-text-primary);
+
+  @media (min-width: 640px) {
+    margin-bottom: 2rem;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.submitButton {
+  width: 100%;
+}
+
+.successMessage {
+  color: var(--g-color-text-positive);
+  text-align: center;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: var(--g-color-base-positive-light);
+  border-radius: 6px;
+}
+
+.footer {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--g-color-line-generic);
+  text-align: center;
+}
