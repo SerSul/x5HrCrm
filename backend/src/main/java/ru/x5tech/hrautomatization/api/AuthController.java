@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.x5tech.hrautomatization.dto.StandardApiResponse;
 import ru.x5tech.hrautomatization.dto.auth.LoginRequest;
 import ru.x5tech.hrautomatization.dto.auth.RegisterRequest;
 import ru.x5tech.hrautomatization.dto.auth.UserInfo;
@@ -40,7 +39,7 @@ public class AuthController {
                     description = "Пользователь успешно зарегистрирован",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = StandardApiResponse.class)
+                            schema = @Schema(implementation = UserInfo.class)
                     )
             ),
             @ApiResponse(
@@ -60,7 +59,7 @@ public class AuthController {
             )
     })
     @PostMapping("/register")
-    public ResponseEntity<StandardApiResponse<UserInfo>> register(
+    public ResponseEntity<UserInfo> register(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Данные для регистрации нового пользователя",
                     required = true,
@@ -70,13 +69,9 @@ public class AuthController {
                     )
             )
             @RequestBody RegisterRequest registerRequest) {
+
         UserInfo userInfo = authService.register(registerRequest);
-        StandardApiResponse<UserInfo> response = StandardApiResponse.success(
-                userInfo,
-                "Registration successful",
-                HttpStatus.CREATED.value()
-        );
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userInfo);
     }
 
     @Operation(
@@ -89,7 +84,7 @@ public class AuthController {
                     description = "Успешный вход в систему",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = StandardApiResponse.class)
+                            schema = @Schema(implementation = UserInfo.class)
                     )
             ),
             @ApiResponse(
@@ -109,7 +104,7 @@ public class AuthController {
             )
     })
     @PostMapping("/login")
-    public ResponseEntity<StandardApiResponse<UserInfo>> login(
+    public ResponseEntity<UserInfo> login(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Учетные данные пользователя для входа",
                     required = true,
@@ -120,13 +115,9 @@ public class AuthController {
             )
             @RequestBody LoginRequest loginRequest,
             @Parameter(hidden = true) HttpServletRequest request) {
+
         UserInfo userInfo = authService.login(loginRequest, request);
-        StandardApiResponse<UserInfo> response = StandardApiResponse.success(
-                userInfo,
-                "Login successful",
-                HttpStatus.OK.value()
-        );
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(userInfo);
     }
 
     @Operation(
@@ -137,10 +128,7 @@ public class AuthController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Успешный выход из системы",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = StandardApiResponse.class)
-                    )
+                    content = @Content(mediaType = "application/json")
             ),
             @ApiResponse(
                     responseCode = "500",
@@ -149,15 +137,11 @@ public class AuthController {
             )
     })
     @PostMapping("/logout")
-    public ResponseEntity<StandardApiResponse<Void>> logout(
+    public ResponseEntity<Void> logout(
             @Parameter(hidden = true) HttpServletRequest request) {
+
         authService.logout(request);
-        StandardApiResponse<Void> response = StandardApiResponse.success(
-                null,
-                "Logout successful",
-                HttpStatus.OK.value()
-        );
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(
@@ -170,7 +154,7 @@ public class AuthController {
                     description = "Информация о пользователе успешно получена",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = StandardApiResponse.class)
+                            schema = @Schema(implementation = UserInfo.class)
                     )
             ),
             @ApiResponse(
@@ -185,13 +169,8 @@ public class AuthController {
             )
     })
     @GetMapping("/me")
-    public ResponseEntity<StandardApiResponse<UserInfo>> getCurrentUser() {
+    public ResponseEntity<UserInfo> getCurrentUser() {
         UserInfo userInfo = authService.getCurrentUser();
-        StandardApiResponse<UserInfo> response = StandardApiResponse.success(
-                userInfo,
-                "User retrieved successfully",
-                HttpStatus.OK.value()
-        );
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(userInfo);
     }
 }
