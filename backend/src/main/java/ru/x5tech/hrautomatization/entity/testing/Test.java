@@ -39,4 +39,7 @@ public class Test {
 
     @Column(name = "max_score")
     private Integer maxScore;
+
+    @Column(name = "min_score")
+    private Integer minScore;
 }

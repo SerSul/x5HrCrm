@@ -16,6 +16,8 @@
             <column name="description" type="TEXT"/>
             <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
             <column name="deleted_at" type="TIMESTAMP"/>
+            <column name="max_score" type="INTEGER"/>
+            <column name="min_score" type="INTEGER"/>
         </createTable>
     </changeSet>
 

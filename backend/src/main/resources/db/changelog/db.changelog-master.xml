@@ -15,5 +15,6 @@
     <include file="/db/changelog/migrations/008-create-test-attempts-table.xml"/>
     <include file="/db/changelog/migrations/009-create-test-answers-table.xml"/>
     <include file="/db/changelog/migrations/010-create-application-recruitment-tables.xml"/>
+    <include file="/db/changelog/migrations/011-add-default-roles.xml"/>
 
 </databaseChangeLog>
