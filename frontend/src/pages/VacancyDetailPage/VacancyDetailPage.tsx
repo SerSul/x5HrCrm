@@ -3,6 +3,7 @@ import { useParams } from 'react-router';
 import { Spin, Card, Button, Text } from '@gravity-ui/uikit';
 import { fetchVacancyByIdRequest } from '../../api/vacancyApi';
 import { useApplicationStore } from '../../storage/applicationStorage';
+import ApplicationTimeline from '../../components/ApplicationTimeline/ApplicationTimeline';
 import type { Vacancy } from '../../api/vacancyApi';
 import styles from './VacancyDetailPage.module.scss';
 
@@ -11,7 +12,7 @@ const VacancyDetailPage = () => {
   const [vacancy, setVacancy] = useState<Vacancy | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { applyToVacancy, applications } = useApplicationStore();
+  const { applyToVacancy, fetchMyApplications, getApplicationByVacancyId } = useApplicationStore();
 
   useEffect(() => {
     if (id) {
@@ -27,7 +28,12 @@ const VacancyDetailPage = () => {
     }
   }, [id]);
 
-  const hasApplied = applications.some((app) => app.vacancyId === id);
+  useEffect(() => {
+    fetchMyApplications();
+  }, [fetchMyApplications]);
+
+  const application = id ? getApplicationByVacancyId(id) : undefined;
+  const hasApplied = !!application;
 
   const handleApply = async () => {
     if (id) {
@@ -48,41 +54,57 @@ const VacancyDetailPage = () => {
   }
 
   return (
-    <div>
-      <Text variant="display-2">{vacancy.title}</Text>
-      <Card className={styles.card}>
-        <div className={styles.details}>
-          <div className={styles.detailItem}>
-            <Text variant="subheader-1" color="secondary">Компания</Text>
-            <Text variant="body-2">{vacancy.company}</Text>
-          </div>
-          <div className={styles.detailItem}>
-            <Text variant="subheader-1" color="secondary">Местоположение</Text>
-            <Text variant="body-2">{vacancy.location}</Text>
-          </div>
-          <div className={styles.detailItem}>
-            <Text variant="subheader-1" color="secondary">Тип занятости</Text>
-            <Text variant="body-2">{vacancy.type}</Text>
-          </div>
-          <div className={styles.detailItem}>
-            <Text variant="subheader-1" color="secondary">Зарплата</Text>
-            <Text variant="body-2">{vacancy.salary}</Text>
-          </div>
+    <div className={styles.page}>
+      <Text variant="display-2" className={styles.pageTitle}>{vacancy.title}</Text>
+
+      <div className={hasApplied ? styles.detailPageWithTimeline : styles.detailPage}>
+        <div className={styles.mainContent}>
+          <Card className={styles.card}>
+            <div className={styles.details}>
+              <div className={styles.detailItem}>
+                <Text variant="subheader-1" color="secondary">Компания</Text>
+                <Text variant="body-2">{vacancy.company}</Text>
+              </div>
+              <div className={styles.detailItem}>
+                <Text variant="subheader-1" color="secondary">Местоположение</Text>
+                <Text variant="body-2">{vacancy.location}</Text>
+              </div>
+              <div className={styles.detailItem}>
+                <Text variant="subheader-1" color="secondary">Тип занятости</Text>
+                <Text variant="body-2">{vacancy.type}</Text>
+              </div>
+              <div className={styles.detailItem}>
+                <Text variant="subheader-1" color="secondary">Зарплата</Text>
+                <Text variant="body-2">{vacancy.salary}</Text>
+              </div>
+            </div>
+            <div className={styles.description}>
+              <Text variant="header-2">Описание вакансии</Text>
+              <Text variant="body-1">{vacancy.description}</Text>
+            </div>
+            <div className={styles.applySection}>
+              {hasApplied ? (
+                <Text variant="body-1" className={styles.appliedMessage}>Вы уже откликнулись на эту вакансию</Text>
+              ) : (
+                <Button size="l" view="action" onClick={handleApply}>
+                  Откликнуться
+                </Button>
+              )}
+            </div>
+          </Card>
         </div>
-        <div className={styles.description}>
-          <Text variant="header-2">Описание вакансии</Text>
-          <Text variant="body-1">{vacancy.description}</Text>
-        </div>
-        <div className={styles.applySection}>
-          {hasApplied ? (
-            <Text variant="body-1" className={styles.appliedMessage}>Вы уже откликнулись на эту вакансию</Text>
-          ) : (
-            <Button size="l" view="action" onClick={handleApply}>
-              Откликнуться
-            </Button>
-          )}
-        </div>
-      </Card>
+
+        {hasApplied && application && (
+          <div className={styles.timelineSection}>
+            <Card>
+              <ApplicationTimeline
+                currentStage={application.currentStage}
+                stageHistory={application.stageHistory}
+              />
+            </Card>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -1,5 +1,21 @@
 import api from './baseApi';
 
+export type ApplicationStage =
+  | 'applied'
+  | 'screening'
+  | 'phone'
+  | 'technical'
+  | 'final'
+  | 'offer'
+  | 'hired'
+  | 'rejected';
+
+export interface ApplicationStageHistory {
+  stage: ApplicationStage;
+  date: string;
+  note?: string;
+}
+
 export interface Application {
   id: string;
   candidateId: string;
@@ -7,7 +23,10 @@ export interface Application {
   candidateEmail: string;
   vacancyId: string;
   vacancyTitle: string;
+  company: string;
   status: 'pending' | 'reviewed' | 'accepted' | 'rejected';
+  currentStage: ApplicationStage;
+  stageHistory: ApplicationStageHistory[];
   appliedAt: string;
 }
 
@@ -25,4 +44,12 @@ export const fetchVacancyApplicationsRequest = async (vacancyId: string) => {
 
 export const updateApplicationStatusRequest = async (id: string, status: string) => {
   return await api.patch(`/applications/${id}/status`, { status });
+};
+
+export const updateApplicationStageRequest = async (
+  id: string,
+  stage: ApplicationStage,
+  note?: string
+) => {
+  return await api.patch(`/applications/${id}/stage`, { stage, note });
 };

@@ -1,0 +1,218 @@
+.timeline {
+  padding: 1.5rem;
+  background: var(--g-color-base-background);
+  border-radius: 8px;
+
+  &.compact {
+    padding: 1rem;
+  }
+}
+
+.title {
+  margin-bottom: 1.5rem;
+}
+
+.stages {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.stage {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+  min-height: 80px;
+
+  &:last-child {
+    min-height: auto;
+  }
+}
+
+.stageIndicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.indicator {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  transition: all 0.2s ease;
+
+  &.completed {
+    background: var(--g-color-base-positive);
+    color: var(--g-color-text-light-primary);
+    border: none;
+  }
+
+  &.current {
+    border: 3px solid var(--g-color-base-info);
+    background: var(--g-color-base-background);
+    animation: pulse 2s infinite;
+  }
+
+  &.future {
+    border: 2px solid var(--g-color-line-generic);
+    background: var(--g-color-base-background);
+  }
+
+  &.rejected {
+    background: var(--g-color-base-danger);
+    color: var(--g-color-text-light-primary);
+    border: none;
+  }
+}
+
+.currentDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--g-color-base-info);
+}
+
+.connector {
+  width: 2px;
+  flex: 1;
+  min-height: 48px;
+  margin-top: 4px;
+
+  &.solid {
+    background: var(--g-color-line-generic);
+  }
+
+  &.dotted {
+    background-image: linear-gradient(
+      to bottom,
+      var(--g-color-line-generic) 50%,
+      transparent 50%
+    );
+    background-size: 2px 8px;
+    background-repeat: repeat-y;
+  }
+}
+
+.stageContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-top: 4px;
+  flex: 1;
+}
+
+.stageLabel {
+  font-weight: 500;
+
+  &.current {
+    color: var(--g-color-text-primary);
+  }
+
+  &.completed {
+    color: var(--g-color-text-positive);
+  }
+
+  &.future {
+    color: var(--g-color-text-secondary);
+  }
+
+  &.rejected {
+    color: var(--g-color-text-danger);
+  }
+}
+
+.stageDescription {
+  margin-top: 0.125rem;
+}
+
+.stageDate {
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+.stageNote {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: var(--g-color-base-generic-ultralight);
+  border-radius: 4px;
+  border-left: 2px solid var(--g-color-line-info);
+}
+
+.currentIndicator {
+  margin-top: 0.5rem;
+  color: var(--g-color-text-info);
+  font-weight: 500;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(82, 149, 224, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(82, 149, 224, 0);
+  }
+}
+
+// Compact mode adjustments
+.compact {
+  .stage {
+    min-height: 60px;
+  }
+
+  .stageContent {
+    gap: 0.125rem;
+  }
+
+  .indicator {
+    width: 24px;
+    height: 24px;
+
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  .currentDot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .connector {
+    min-height: 36px;
+  }
+}
+
+// Mobile responsive
+@media (max-width: 640px) {
+  .timeline {
+    padding: 1rem;
+  }
+
+  .title {
+    margin-bottom: 1rem;
+  }
+
+  .stage {
+    gap: 0.75rem;
+    min-height: 70px;
+  }
+
+  .indicator {
+    width: 28px;
+    height: 28px;
+  }
+
+  .connector {
+    min-height: 42px;
+  }
+}

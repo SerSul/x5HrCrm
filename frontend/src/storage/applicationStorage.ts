@@ -4,7 +4,9 @@ import {
   fetchMyApplicationsRequest,
   fetchVacancyApplicationsRequest,
   updateApplicationStatusRequest,
+  updateApplicationStageRequest,
   type Application,
+  type ApplicationStage,
 } from '../api/applicationApi';
 
 interface ApplicationState {
@@ -15,6 +17,8 @@ interface ApplicationState {
   fetchMyApplications: () => Promise<void>;
   fetchVacancyApplications: (vacancyId: string) => Promise<void>;
   updateApplicationStatus: (id: string, status: string) => Promise<void>;
+  updateApplicationStage: (id: string, stage: ApplicationStage, note?: string) => Promise<void>;
+  getApplicationByVacancyId: (vacancyId: string) => Application | undefined;
 }
 
 export const useApplicationStore = create<ApplicationState>()((set) => ({
@@ -80,5 +84,28 @@ export const useApplicationStore = create<ApplicationState>()((set) => ({
         loading: false,
       });
     }
+  },
+
+  updateApplicationStage: async (id: string, stage: ApplicationStage, note?: string) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await updateApplicationStageRequest(id, stage, note);
+      set((state) => ({
+        applications: state.applications.map((app) =>
+          app.id === id ? res.data : app
+        ),
+        loading: false,
+      }));
+    } catch (error: any) {
+      set({
+        error: error?.response?.data?.message || 'Failed to update application stage',
+        loading: false,
+      });
+    }
+  },
+
+  getApplicationByVacancyId: (vacancyId: string): Application | undefined => {
+    const state: ApplicationState = useApplicationStore.getState();
+    return state.applications.find((app: Application) => app.vacancyId === vacancyId);
   },
 }));

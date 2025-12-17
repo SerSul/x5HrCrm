@@ -1,0 +1,182 @@
+.sidebar {
+  width: 320px;
+  min-width: 320px;
+  height: calc(100vh - 60px);
+  position: sticky;
+  top: 60px;
+  background: var(--g-color-base-background);
+  border-right: 1px solid var(--g-color-line-generic);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  // Mobile: overlay sidebar
+  @media (max-width: 1023px) {
+    position: fixed;
+    left: 0;
+    top: 60px;
+    z-index: 100;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+
+    &.visible {
+      transform: translateX(0);
+    }
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1rem 0.75rem 1rem;
+  border-bottom: 1px solid var(--g-color-line-generic);
+
+  .closeButton {
+    // Hide on desktop
+    @media (min-width: 1024px) {
+      display: none;
+    }
+  }
+}
+
+.filterSection {
+  padding: 1rem;
+  border-bottom: 1px solid var(--g-color-line-generic);
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.75rem;
+
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--g-color-base-background);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--g-color-line-generic);
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--g-color-text-hint);
+    }
+  }
+}
+
+.loadingState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 1rem;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.applicationsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.applicationCard {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--g-color-line-generic);
+
+  &:hover {
+    border-color: var(--g-color-line-info);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  &.selected {
+    border-color: var(--g-color-line-info);
+    background: var(--g-color-base-selection);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.vacancyTitle {
+  flex: 1;
+  min-width: 0;
+  word-wrap: break-word;
+  line-height: 1.3;
+}
+
+.company {
+  font-size: 0.875rem;
+}
+
+.cardFooter {
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--g-color-line-generic);
+}
+
+.footer {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--g-color-line-generic);
+  background: var(--g-color-base-generic-ultralight);
+  text-align: center;
+}
+
+// Tablet adjustments
+@media (max-width: 1023px) and (min-width: 640px) {
+  .sidebar {
+    width: 360px;
+    min-width: 360px;
+  }
+}
+
+// Mobile adjustments
+@media (max-width: 639px) {
+  .sidebar {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .header {
+    padding: 0.75rem 1rem 0.5rem 1rem;
+  }
+
+  .filterSection {
+    padding: 0.75rem 1rem;
+  }
+
+  .content {
+    padding: 0.5rem;
+  }
+
+  .applicationsList {
+    gap: 0.5rem;
+  }
+}

@@ -1,0 +1,68 @@
+.homePage {
+  display: flex;
+  gap: 0;
+  position: relative;
+  min-height: calc(100vh - 60px);
+}
+
+.mainContent {
+  flex: 1;
+  min-width: 0;
+  padding: 2rem;
+
+  @media (max-width: 1023px) {
+    padding: 1.5rem;
+  }
+
+  @media (max-width: 639px) {
+    padding: 1rem;
+  }
+}
+
+.toggleButton {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 99;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // Hide on desktop
+  @media (min-width: 1024px) {
+    display: none;
+  }
+
+  &:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  top: 60px;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+
+  &.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  // Hide on desktop
+  @media (min-width: 1024px) {
+    display: none;
+  }
+}

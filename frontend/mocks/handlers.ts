@@ -101,7 +101,20 @@ let mockApplications = [
     candidateEmail: 'alice.johnson@example.com',
     vacancyId: '1',
     vacancyTitle: 'Senior Frontend Developer',
+    company: 'Tech Corp',
     status: 'pending',
+    currentStage: 'screening',
+    stageHistory: [
+      {
+        stage: 'applied',
+        date: '2025-12-10T10:00:00Z',
+      },
+      {
+        stage: 'screening',
+        date: '2025-12-12T15:30:00Z',
+        note: 'Resume reviewed, moving to screening',
+      },
+    ],
     appliedAt: '2025-12-10T10:00:00Z',
   },
   {
@@ -111,7 +124,29 @@ let mockApplications = [
     candidateEmail: 'bob.martinez@example.com',
     vacancyId: '2',
     vacancyTitle: 'Backend Engineer',
+    company: 'StartupXYZ',
     status: 'reviewed',
+    currentStage: 'technical',
+    stageHistory: [
+      {
+        stage: 'applied',
+        date: '2025-12-11T14:30:00Z',
+      },
+      {
+        stage: 'screening',
+        date: '2025-12-12T09:00:00Z',
+      },
+      {
+        stage: 'phone',
+        date: '2025-12-13T16:00:00Z',
+        note: 'Phone interview completed successfully',
+      },
+      {
+        stage: 'technical',
+        date: '2025-12-15T10:00:00Z',
+        note: 'Technical interview scheduled',
+      },
+    ],
     appliedAt: '2025-12-11T14:30:00Z',
   },
   {
@@ -121,7 +156,38 @@ let mockApplications = [
     candidateEmail: 'carol.white@example.com',
     vacancyId: '3',
     vacancyTitle: 'UI/UX Designer',
+    company: 'Design Studio',
     status: 'accepted',
+    currentStage: 'hired',
+    stageHistory: [
+      {
+        stage: 'applied',
+        date: '2025-12-09T09:15:00Z',
+      },
+      {
+        stage: 'screening',
+        date: '2025-12-10T11:00:00Z',
+      },
+      {
+        stage: 'phone',
+        date: '2025-12-11T14:00:00Z',
+      },
+      {
+        stage: 'final',
+        date: '2025-12-13T10:00:00Z',
+        note: 'Final interview with design team',
+      },
+      {
+        stage: 'offer',
+        date: '2025-12-14T16:00:00Z',
+        note: 'Offer extended',
+      },
+      {
+        stage: 'hired',
+        date: '2025-12-16T09:00:00Z',
+        note: 'Offer accepted, starting January 2026',
+      },
+    ],
     appliedAt: '2025-12-09T09:15:00Z',
   },
 ];
@@ -236,6 +302,7 @@ export const handlers = [
     console.log('Mock apply to vacancy called with:', body);
 
     const vacancy = mockVacancies.find(v => v.id === body.vacancyId);
+    const now = new Date().toISOString();
     const newApplication = {
       id: `app-${Date.now()}`,
       candidateId: 'user-456',
@@ -243,8 +310,16 @@ export const handlers = [
       candidateEmail: 'jane.smith@example.com',
       vacancyId: body.vacancyId,
       vacancyTitle: vacancy?.title || 'Unknown Position',
+      company: vacancy?.company || 'Unknown Company',
       status: 'pending' as const,
-      appliedAt: new Date().toISOString(),
+      currentStage: 'applied' as const,
+      stageHistory: [
+        {
+          stage: 'applied' as const,
+          date: now,
+        },
+      ],
+      appliedAt: now,
     };
 
     mockApplications.push(newApplication);
@@ -275,6 +350,32 @@ export const handlers = [
       mockApplications[appIndex] = {
         ...mockApplications[appIndex],
         status: body.status as any,
+      };
+      return HttpResponse.json(mockApplications[appIndex]);
+    }
+    return new HttpResponse(null, { status: 404 });
+  }),
+
+  // Update application stage (recruiter)
+  http.patch('http://localhost:3000/applications/:id/stage', async ({ params, request }) => {
+    const body = await request.json() as { stage: string; note?: string };
+    console.log('Mock update application stage called with id:', params.id, 'stage:', body.stage);
+
+    const appIndex = mockApplications.findIndex(app => app.id === params.id);
+    if (appIndex !== -1) {
+      const updatedStageHistory = [
+        ...mockApplications[appIndex].stageHistory,
+        {
+          stage: body.stage as any,
+          date: new Date().toISOString(),
+          ...(body.note && { note: body.note }),
+        },
+      ];
+
+      mockApplications[appIndex] = {
+        ...mockApplications[appIndex],
+        currentStage: body.stage as any,
+        stageHistory: updatedStageHistory,
       };
       return HttpResponse.json(mockApplications[appIndex]);
     }
