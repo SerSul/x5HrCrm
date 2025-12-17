@@ -21,14 +21,6 @@
                 <constraints nullable="true"/>
             </column>
 
-            <column name="department" type="VARCHAR(255)">
-                <constraints nullable="true"/>
-            </column>
-
-            <column name="location" type="VARCHAR(255)">
-                <constraints nullable="true"/>
-            </column>
-
             <column name="employment_type" type="VARCHAR(50)">
                 <constraints nullable="true"/>
             </column>
@@ -60,10 +52,6 @@
 
         <createIndex tableName="directions" indexName="idx_directions_is_active">
             <column name="is_active"/>
-        </createIndex>
-
-        <createIndex tableName="directions" indexName="idx_directions_department">
-            <column name="department"/>
         </createIndex>
     </changeSet>
 

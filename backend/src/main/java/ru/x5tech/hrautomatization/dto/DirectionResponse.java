@@ -2,6 +2,7 @@ package ru.x5tech.hrautomatization.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import ru.x5tech.hrautomatization.entity.application.EmploymentType;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +17,15 @@ public record DirectionResponse(
         @JsonProperty("description")
         String description,
 
+        @JsonProperty("employment_type")
+        EmploymentType employmentType,
+
+        @JsonProperty("salary_min")
+        Integer salaryMin,
+
+        @JsonProperty("salary_max")
+        Integer salaryMax,
+
         @JsonProperty("active")
         boolean active,
 
@@ -23,5 +33,8 @@ public record DirectionResponse(
         LocalDateTime createdAt,
 
         @JsonProperty("closed_at")
-        LocalDateTime closedAt
+        LocalDateTime closedAt,
+
+        @JsonProperty("test_id")
+        Long testId
 ) {}

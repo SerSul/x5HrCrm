@@ -18,5 +18,6 @@
     <include file="/db/changelog/mock-data/MOCK-001-add-default-roles.xml"/>
     <include file="/db/changelog/mock-data/MOCK-002-insert-test-directions.xml"/>
     <include file="/db/changelog/migrations/011-add-test-id-to-directions.xml"/>
+    <include file="/db/changelog/mock-data/MOCK-003-insert-direction-statuses.xml"/>
 
 </databaseChangeLog>

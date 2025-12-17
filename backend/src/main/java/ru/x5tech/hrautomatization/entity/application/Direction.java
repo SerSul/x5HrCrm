@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
+import ru.x5tech.hrautomatization.entity.testing.Test;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +33,16 @@ public class Direction {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "employment_type", length = 50)
+    private EmploymentType employmentType;
+
+    @Column(name = "salary_min")
+    private Integer salaryMin;
+
+    @Column(name = "salary_max")
+    private Integer salaryMax;
+
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
@@ -44,6 +55,10 @@ public class Direction {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "test_id")
+    private Test test;
 
     @OneToMany(mappedBy = "direction", cascade = CascadeType.ALL)
     private List<Application> applications;

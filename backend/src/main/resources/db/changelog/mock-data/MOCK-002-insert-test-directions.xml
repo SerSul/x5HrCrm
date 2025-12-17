@@ -6,34 +6,50 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
 
     <changeSet id="004-insert-test-directions" author="laplas7">
-        <comment>Тестовые направления для IT</comment>
+        <comment>Тестовые IT-направления с полными данными</comment>
 
+        <!-- Junior Java Developer -->
         <insert tableName="directions">
-            <column name="title"       value="Junior Java Developer"/>
-            <column name="description" value="Стажёр/Junior Java разработчик в IT-команду"/>
-            <column name="is_active"   valueBoolean="true"/>
-            <column name="created_at"  valueDate="2025-01-01T10:00:00"/>
+            <column name="title"            value="Junior Java Developer"/>
+            <column name="description"      value="Стажёр/Junior Java разработчик в IT-команду"/>
+            <column name="employment_type"  value="FULL_TIME"/>
+            <column name="salary_min"       valueNumeric="80000"/>
+            <column name="salary_max"       valueNumeric="150000"/>
+            <column name="is_active"        valueBoolean="true"/>
+            <column name="created_at"       valueDate="2025-01-01T10:00:00"/>
         </insert>
 
+        <!-- Middle Java Developer -->
         <insert tableName="directions">
-            <column name="title"       value="Middle Java Developer"/>
-            <column name="description" value="Middle Java разработчик в продуктовую команду IT"/>
-            <column name="is_active"   valueBoolean="true"/>
-            <column name="created_at"  valueDate="2025-01-01T10:05:00"/>
+            <column name="title"            value="Middle Java Developer"/>
+            <column name="description"      value="Middle Java разработчик в продуктовую команду IT"/>
+            <column name="employment_type"  value="FULL_TIME"/>
+            <column name="salary_min"       valueNumeric="150000"/>
+            <column name="salary_max"       valueNumeric="250000"/>
+            <column name="is_active"        valueBoolean="true"/>
+            <column name="created_at"       valueDate="2025-01-01T10:05:00"/>
         </insert>
 
+        <!-- DevOps Engineer -->
         <insert tableName="directions">
-            <column name="title"       value="DevOps Engineer"/>
-            <column name="description" value="Инженер DevOps / платформенная команда IT"/>
-            <column name="is_active"   valueBoolean="true"/>
-            <column name="created_at"  valueDate="2025-01-01T10:10:00"/>
+            <column name="title"            value="DevOps Engineer"/>
+            <column name="description"      value="Инженер DevOps / платформенная команда IT"/>
+            <column name="employment_type"  value="FULL_TIME"/>
+            <column name="salary_min"       valueNumeric="160000"/>
+            <column name="salary_max"       valueNumeric="260000"/>
+            <column name="is_active"        valueBoolean="true"/>
+            <column name="created_at"       valueDate="2025-01-01T10:10:00"/>
         </insert>
 
+        <!-- QA Automation Engineer -->
         <insert tableName="directions">
-            <column name="title"       value="QA Automation Engineer"/>
-            <column name="description" value="Автоматизатор тестирования (Java/Selenium) в IT-направление"/>
-            <column name="is_active"   valueBoolean="true"/>
-            <column name="created_at"  valueDate="2025-01-01T10:15:00"/>
+            <column name="title"            value="QA Automation Engineer"/>
+            <column name="description"      value="Автоматизатор тестирования (Java/Selenium) в IT-направление"/>
+            <column name="employment_type"  value="FULL_TIME"/>
+            <column name="salary_min"       valueNumeric="120000"/>
+            <column name="salary_max"       valueNumeric="200000"/>
+            <column name="is_active"        valueBoolean="true"/>
+            <column name="created_at"       valueDate="2025-01-01T10:15:00"/>
         </insert>
     </changeSet>
 </databaseChangeLog>

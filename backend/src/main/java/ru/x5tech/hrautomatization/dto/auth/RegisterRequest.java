@@ -19,11 +19,14 @@ public record RegisterRequest(
         String phone,
 
         @Schema(description = "Имя", example = "Иван", requiredMode = Schema.RequiredMode.REQUIRED)
+                @JsonProperty("first_name")
         String firstName,
 
         @Schema(description = "Фамилия", example = "Иванов", requiredMode = Schema.RequiredMode.REQUIRED)
+        @JsonProperty("last_name")
         String lastName,
 
         @Schema(description = "Отчество", example = "Иванович")
+        @JsonProperty("middle_name")
         String middleName
 ) {}

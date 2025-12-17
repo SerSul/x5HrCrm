@@ -2,6 +2,7 @@ package ru.x5tech.hrautomatization.dto.technical;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -54,5 +55,6 @@ public class ErrorResponse {
             description = "Список ошибок валидации (если применимо)",
             example = "[\"Email не может быть пустым\", \"Пароль должен содержать минимум 6 символов\"]"
     )
+    @JsonProperty("validation_errors")
     private List<String> validationErrors;
 }

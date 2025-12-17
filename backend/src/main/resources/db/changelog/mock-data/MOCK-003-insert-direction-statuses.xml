@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="013-insert-direction-statuses" author="laplas7">
+        <comment>Статусы направлений: intermediate + финальные (mandatory)</comment>
+
+        <!-- JUNIOR JAVA -->
+
+        <!-- 1. Новый отклик -->
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'Junior Java Developer' LIMIT 1)"/>
+            <column name="title"           value="Новый отклик"/>
+            <column name="description"     value="Кандидат только что откликнулся на направление"/>
+            <column name="sequence_order"  valueNumeric="1"/>
+            <column name="is_mandatory"    valueBoolean="false"/>
+        </insert>
+
+        <!-- 2. Тестирование -->
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'Junior Java Developer' LIMIT 1)"/>
+            <column name="title"           value="Тестирование"/>
+            <column name="description"     value="Кандидат проходит онлайн-тест"/>
+            <column name="sequence_order"  valueNumeric="2"/>
+            <column name="is_mandatory"    valueBoolean="false"/>
+        </insert>
+
+        <!-- 3. Собеседование -->
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'Junior Java Developer' LIMIT 1)"/>
+            <column name="title"           value="Собеседование"/>
+            <column name="description"     value="Интервью с рекрутером/тимлидом"/>
+            <column name="sequence_order"  valueNumeric="3"/>
+            <column name="is_mandatory"    valueBoolean="false"/>
+        </insert>
+
+        <!-- 4. Оффер принят (финальный) -->
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'Junior Java Developer' LIMIT 1)"/>
+            <column name="title"           value="Оффер принят"/>
+            <column name="description"     value="Кандидат принял оффер и выходит на работу"/>
+            <column name="sequence_order"  valueNumeric="4"/>
+            <column name="is_mandatory"    valueBoolean="true"/>
+        </insert>
+
+        <!-- 5. Отказ (финальный) -->
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'Junior Java Developer' LIMIT 1)"/>
+            <column name="title"           value="Отказ"/>
+            <column name="description"     value="Кандидат отклонён или отказался от участия"/>
+            <column name="sequence_order"  valueNumeric="5"/>
+            <column name="is_mandatory"    valueBoolean="true"/>
+        </insert>
+
+        <!-- MIDDLE JAVA -->
+
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'Middle Java Developer' LIMIT 1)"/>
+            <column name="title"           value="Новый отклик"/>
+            <column name="description"     value="Кандидат только что откликнулся на направление"/>
+            <column name="sequence_order"  valueNumeric="1"/>
+            <column name="is_mandatory"    valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'Middle Java Developer' LIMIT 1)"/>
+            <column name="title"           value="Тестирование"/>
+            <column name="description"     value="Кандидат проходит онлайн-тест"/>
+            <column name="sequence_order"  valueNumeric="2"/>
+            <column name="is_mandatory"    valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'Middle Java Developer' LIMIT 1)"/>
+            <column name="title"           value="Собеседование"/>
+            <column name="description"     value="Интервью с рекрутером/тимлидом"/>
+            <column name="sequence_order"  valueNumeric="3"/>
+            <column name="is_mandatory"    valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'Middle Java Developer' LIMIT 1)"/>
+            <column name="title"           value="Оффер принят"/>
+            <column name="description"     value="Кандидат принял оффер и выходит на работу"/>
+            <column name="sequence_order"  valueNumeric="4"/>
+            <column name="is_mandatory"    valueBoolean="true"/>
+        </insert>
+
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'Middle Java Developer' LIMIT 1)"/>
+            <column name="title"           value="Отказ"/>
+            <column name="description"     value="Кандидат отклонён или отказался от участия"/>
+            <column name="sequence_order"  valueNumeric="5"/>
+            <column name="is_mandatory"    valueBoolean="true"/>
+        </insert>
+
+        <!-- DEVOPS -->
+
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'DevOps Engineer' LIMIT 1)"/>
+            <column name="title"           value="Новый отклик"/>
+            <column name="description"     value="Кандидат только что откликнулся на направление"/>
+            <column name="sequence_order"  valueNumeric="1"/>
+            <column name="is_mandatory"    valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'DevOps Engineer' LIMIT 1)"/>
+            <column name="title"           value="Тестирование"/>
+            <column name="description"     value="Кандидат проходит онлайн-тест"/>
+            <column name="sequence_order"  valueNumeric="2"/>
+            <column name="is_mandatory"    valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'DevOps Engineer' LIMIT 1)"/>
+            <column name="title"           value="Собеседование"/>
+            <column name="description"     value="Интервью с рекрутером/тимлидом"/>
+            <column name="sequence_order"  valueNumeric="3"/>
+            <column name="is_mandatory"    valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'DevOps Engineer' LIMIT 1)"/>
+            <column name="title"           value="Оффер принят"/>
+            <column name="description"     value="Кандидат принял оффер и выходит на работу"/>
+            <column name="sequence_order"  valueNumeric="4"/>
+            <column name="is_mandatory"    valueBoolean="true"/>
+        </insert>
+
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'DevOps Engineer' LIMIT 1)"/>
+            <column name="title"           value="Отказ"/>
+            <column name="description"     value="Кандидат отклонён или отказался от участия"/>
+            <column name="sequence_order"  valueNumeric="5"/>
+            <column name="is_mandatory"    valueBoolean="true"/>
+        </insert>
+
+        <!-- QA AUTOMATION -->
+
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'QA Automation Engineer' LIMIT 1)"/>
+            <column name="title"           value="Новый отклик"/>
+            <column name="description"     value="Кандидат только что откликнулся на направление"/>
+            <column name="sequence_order"  valueNumeric="1"/>
+            <column name="is_mandatory"    valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'QA Automation Engineer' LIMIT 1)"/>
+            <column name="title"           value="Тестирование"/>
+            <column name="description"     value="Кандидат проходит онлайн-тест"/>
+            <column name="sequence_order"  valueNumeric="2"/>
+            <column name="is_mandatory"    valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'QA Automation Engineer' LIMIT 1)"/>
+            <column name="title"           value="Собеседование"/>
+            <column name="description"     value="Интервью с рекрутером/тимлидом"/>
+            <column name="sequence_order"  valueNumeric="3"/>
+            <column name="is_mandatory"    valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'QA Automation Engineer' LIMIT 1)"/>
+            <column name="title"           value="Оффер принят"/>
+            <column name="description"     value="Кандидат принял оффер и выходит на работу"/>
+            <column name="sequence_order"  valueNumeric="4"/>
+            <column name="is_mandatory"    valueBoolean="true"/>
+        </insert>
+
+        <insert tableName="direction_statuses">
+            <column name="direction_id"
+                    valueComputed="(SELECT id FROM directions WHERE title = 'QA Automation Engineer' LIMIT 1)"/>
+            <column name="title"           value="Отказ"/>
+            <column name="description"     value="Кандидат отклонён или отказался от участия"/>
+            <column name="sequence_order"  valueNumeric="5"/>
+            <column name="is_mandatory"    valueBoolean="true"/>
+        </insert>
+
+    </changeSet>
+</databaseChangeLog>
