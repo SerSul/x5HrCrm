@@ -1,28 +1,47 @@
-# Stage 1: Build
+# Stage 1: Install all workspace dependencies
+FROM oven/bun:latest AS deps
+
+WORKDIR /app
+
+# Copy workspace root metadata
+COPY package.json bun.lock ./
+
+# Copy all workspace package.json files for proper resolution
+COPY packages/ui-components/package.json ./packages/ui-components/
+COPY apps/candidate-web/package.json ./apps/candidate-web/
+COPY apps/recruiter-web/package.json ./apps/recruiter-web/
+
+# Install all workspace dependencies
+RUN bun install --frozen-lockfile
+
+# Stage 2: Build the app
 FROM oven/bun:latest AS builder
 
 WORKDIR /app
 
-# Copy dependency files
-COPY package.json bun.lock ./
+# First, copy all installed dependencies from deps stage
+COPY --from=deps /app .
 
-# Install dependencies
-RUN bun install --frozen-lockfile
-
-# Copy source code
+# Then copy source code (will overwrite package.json but not node_modules)
 COPY . .
 
-# Build the application
+# Reinstall to ensure all dependencies are present (will use cached node_modules)
+RUN bun install --frozen-lockfile
+
+# Set working directory to app
+WORKDIR /app/apps/candidate-web
+
+# Build the app (tsc -b && vite build)
 RUN bun run build
 
-# Stage 2: Production
+# Stage 3: Production runtime
 FROM nginx:alpine
 
-# Copy custom nginx configuration
-COPY nginx/nginx.conf /etc/nginx/nginx.conf
+# Copy nginx config from build context
+COPY apps/candidate-web/nginx/nginx.conf /etc/nginx/nginx.conf
 
-# Copy built files from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copy built static files
+COPY --from=builder /app/apps/candidate-web/dist /usr/share/nginx/html
 
 # Expose port 80
 EXPOSE 80
