@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.x5tech.hrautomatization.config.CustomUserDetails;
 import ru.x5tech.hrautomatization.dto.auth.LoginRequest;
 import ru.x5tech.hrautomatization.dto.auth.RegisterRequest;
 import ru.x5tech.hrautomatization.dto.auth.UserInfo;
@@ -43,7 +44,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserInfo register(RegisterRequest registerRequest) {
+    public UserInfo register(RegisterRequest registerRequest, HttpServletRequest request) {
         if (userRepository.existsByEmail(registerRequest.email())) {
             throw new UserAlreadyExistsException("User with email " + registerRequest.email() + " already exists");
         }
@@ -67,7 +68,26 @@ public class AuthService {
         user.setRoles(Set.of(userRole));
         userRepository.save(user);
 
-        return new UserInfo(user.getEmail(), Set.of("ROLE_USER"));
+        CustomUserDetails principal = new CustomUserDetails(user);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                principal,
+                null,
+                principal.getAuthorities()
+        );
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        securityContext.setAuthentication(authentication);
+
+        HttpSession session = request.getSession(true);
+        session.setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                securityContext
+        );
+
+        return new UserInfo(
+                principal.getEmail(),
+                principal.getAuthorities()
+        );
     }
 
     public UserInfo login(LoginRequest loginRequest, HttpServletRequest request) {

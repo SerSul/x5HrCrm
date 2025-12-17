@@ -68,9 +68,11 @@ public class AuthController {
                             schema = @Schema(implementation = RegisterRequest.class)
                     )
             )
-            @RequestBody RegisterRequest registerRequest) {
+            @RequestBody RegisterRequest registerRequest,
+            HttpServletRequest request
+    ) {
 
-        UserInfo userInfo = authService.register(registerRequest);
+        UserInfo userInfo = authService.register(registerRequest, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(userInfo);
     }
 
