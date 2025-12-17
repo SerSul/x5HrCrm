@@ -32,9 +32,9 @@ services:
       - "traefik.enable=true"
       # Define router
       - "traefik.http.routers.candidate.entrypoints=web"
+      - "traefik.http.routers.candidate.rule=Host(`109.73.199.198`)"
       # Define service
       - "traefik.http.services.candidate.loadbalancer.server.port=80"
-      - "traefik.http.routers.candidate.rule=ClientIP(`109.73.199.198`)"
     networks:
       - proxy
     depends_on:
@@ -51,9 +51,9 @@ services:
       - "traefik.enable=true"
       # Define router
       - "traefik.http.routers.recruiter.entrypoints=recruiter"
+      - "traefik.http.routers.recruiter.rule=Host(`109.73.199.198`)"
       # Define service
       - "traefik.http.services.recruiter.loadbalancer.server.port=80"
-      - "traefik.http.routers.recruiter.rule=ClientIP(`109.73.199.198`)"
     networks:
       - proxy
     depends_on:
