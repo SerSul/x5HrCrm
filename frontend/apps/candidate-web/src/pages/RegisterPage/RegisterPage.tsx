@@ -1,26 +1,40 @@
 import { Button, Card, TextInput, Text } from '@gravity-ui/uikit';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuthStore } from '../../storage/authStorage';
 import Link from '@shared/ui/components/Link/Link';
 import styles from './RegisterPage.module.scss';
 
 const RegisterPage = () => {
-  const [login, setLogin] = useState('');
-  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [middleName, setMiddleName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
 
-  const register = useAuthStore((state) => state.register);
-  const user = useAuthStore((state) => state.user);
+  const { register, loading, error, clearError } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(login, password, email, phone);
-
-    await register({ login, password, email, phone });
-    navigate('/');
+    try {
+      await register({
+        firstName,
+        lastName,
+        middleName: middleName || undefined,
+        email,
+        password,
+        phone: phone || undefined,
+      });
+      navigate('/');
+    } catch (err) {
+      console.error('Registration failed:', err);
+    }
   };
 
   return (
@@ -31,9 +45,38 @@ const RegisterPage = () => {
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.field}>
               <TextInput
-                value={login}
-                onChange={(e) => setLogin(e.target.value)}
-                placeholder="Логин"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Имя"
+                disabled={loading}
+                required
+              />
+            </div>
+            <div className={styles.field}>
+              <TextInput
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Фамилия"
+                disabled={loading}
+                required
+              />
+            </div>
+            <div className={styles.field}>
+              <TextInput
+                value={middleName}
+                onChange={(e) => setMiddleName(e.target.value)}
+                placeholder="Отчество (необязательно)"
+                disabled={loading}
+              />
+            </div>
+            <div className={styles.field}>
+              <TextInput
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                placeholder="Email"
+                disabled={loading}
+                required
               />
             </div>
             <div className={styles.field}>
@@ -42,14 +85,8 @@ const RegisterPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
                 placeholder="Пароль"
-              />
-            </div>
-            <div className={styles.field}>
-              <TextInput
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                type="email"
-                placeholder="Электронная почта"
+                disabled={loading}
+                required
               />
             </div>
             <div className={styles.field}>
@@ -57,15 +94,25 @@ const RegisterPage = () => {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 type="tel"
-                placeholder="Телефон"
+                placeholder="Телефон (необязательно)"
+                disabled={loading}
               />
             </div>
+            {error && (
+              <Text variant="body-1" color="danger" className={styles.errorMessage}>
+                {error}
+              </Text>
+            )}
             <div className={styles.actions}>
-              <Button type="submit" className={styles.submitButton}>
+              <Button
+                type="submit"
+                className={styles.submitButton}
+                loading={loading}
+                disabled={loading}
+              >
                 Регистрация
               </Button>
             </div>
-            {user && <Text variant="body-1" className={styles.successMessage}>Регистрация прошла успешно!</Text>}
           </form>
           <div className={styles.footer}>
             <Text variant="body-2">

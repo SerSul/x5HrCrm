@@ -1,22 +1,29 @@
 import { Button, Card, TextInput, Text } from '@gravity-ui/uikit';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuthStore } from '../../storage/authStorage';
 import Link from '@shared/ui/components/Link/Link';
 import styles from './LoginPage.module.scss';
 
 const LoginPage = () => {
-  const [login, setLogin] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const loginAction = useAuthStore((state) => state.login);
-  const user = useAuthStore((state) => state.user);
+  const { login: loginAction, loading, error, clearError } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await loginAction({ login, password });
-    navigate('/');
+    try {
+      await loginAction({ email, password });
+      navigate('/');
+    } catch (err) {
+      console.error('Login failed:', err);
+    }
   };
 
   return (
@@ -27,9 +34,12 @@ const LoginPage = () => {
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.field}>
               <TextInput
-                placeholder="Логин"
-                value={login}
-                onChange={(e) => setLogin(e.target.value)}
+                placeholder="Email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+                required
               />
             </div>
             <div className={styles.field}>
@@ -38,14 +48,25 @@ const LoginPage = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+                required
               />
             </div>
+            {error && (
+              <Text variant="body-1" color="danger" className={styles.errorMessage}>
+                {error}
+              </Text>
+            )}
             <div className={styles.actions}>
-              <Button type="submit" className={styles.submitButton}>
+              <Button
+                type="submit"
+                className={styles.submitButton}
+                loading={loading}
+                disabled={loading}
+              >
                 Вход
               </Button>
             </div>
-            {user && <Text variant="body-1" className={styles.successMessage}>Вы успешно вошли!</Text>}
           </form>
           <div className={styles.footer}>
             <Text variant="body-2">

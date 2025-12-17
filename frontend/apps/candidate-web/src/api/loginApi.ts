@@ -1,10 +1,10 @@
 import api from './baseApi';
 
 export interface LoginParams {
-  login: string;
+  email: string;
   password: string;
 }
 
 export const loginRequest = async (params: LoginParams) => {
-  return await api.post('/login', params);
+  return await api.post('/auth/login', params);
 };

@@ -1,16 +1,14 @@
 import api from './baseApi';
 
 export interface RegisterParams {
-  login: string;
-  password: string;
   email: string;
-  phone: string;
+  password: string;
+  phone?: string;
+  firstName: string;
+  lastName: string;
+  middleName?: string;
 }
 
 export const registerRequest = async (params: RegisterParams) => {
-  return await api.post('/register', params);
-};
-
-export const registerRecruiterRequest = async (params: RegisterParams) => {
-  return await api.post('/register/recruiter', params);
+  return await api.post('/auth/register', params);
 };

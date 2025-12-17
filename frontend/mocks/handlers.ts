@@ -1,5 +1,11 @@
 import { http, HttpResponse } from 'msw'
 
+// Mock session storage (in-memory)
+let mockSession: {
+  username: string;
+  authorities: { authority: string }[];
+} | null = null;
+
 // Mock data storage
 const mockVacancies = [
   {
@@ -193,75 +199,82 @@ let mockApplications = [
 ];
 
 export const handlers = [
-  // Candidate registration
-  http.post('http://localhost:3000/register', async ({ request }) => {
-    const body = await request.json();
-    console.log('Mock candidate register called with:', body);
+  // Register endpoint (matching real API)
+  http.post('http://localhost:3000/auth/register', async ({ request }) => {
+    const body = await request.json() as {
+      email: string;
+      password: string;
+      firstName: string;
+      lastName: string;
+      middleName?: string;
+      phone?: string;
+    };
+    console.log('Mock register called with:', body);
 
-    return HttpResponse.json({
-      user: {
-        id: 'user-123',
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        phone: '+1 (555) 123-4567',
-        role: 'candidate',
-        experience: '',
-        skills: '',
+    // Determine role based on email (simple mock logic)
+    const isRecruiter = body.email.includes('recruiter');
+
+    mockSession = {
+      username: body.email,
+      authorities: [
+        { authority: isRecruiter ? 'ROLE_RECRUITER' : 'ROLE_CANDIDATE' }
+      ],
+    };
+
+    return HttpResponse.json(mockSession, {
+      headers: {
+        'Set-Cookie': 'JSESSIONID=mock-session-id; Path=/; HttpOnly',
       },
-      token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-    })
+    });
   }),
 
-  // Recruiter registration
-  http.post('http://localhost:3000/register/recruiter', async ({ request }) => {
-    const body = await request.json();
-    console.log('Mock recruiter register called with:', body);
-
-    return HttpResponse.json({
-      user: {
-        id: 'rec-123',
-        name: 'Recruiter Sarah',
-        email: 'sarah.recruiter@company.com',
-        phone: '+1 (555) 999-8888',
-        role: 'recruiter',
-      },
-      token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWMxMjMiLCJuYW1lIjoiUmVjcnVpdGVyIFNhcmFoIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-    })
-  }),
-
-  // Login (returns candidate by default)
-  http.post('http://localhost:3000/login', async ({ request }) => {
-    const body = await request.json();
+  // Login endpoint (matching real API)
+  http.post('http://localhost:3000/auth/login', async ({ request }) => {
+    const body = await request.json() as {
+      email: string;
+      password: string;
+    };
     console.log('Mock login called with:', body);
 
-    // Simple logic: if login contains 'recruiter', return recruiter role
-    const isRecruiter = (body as any).login?.includes('recruiter');
+    // Determine role based on email
+    const isRecruiter = body.email.includes('recruiter');
 
-    if (isRecruiter) {
-      return HttpResponse.json({
-        user: {
-          id: 'rec-456',
-          name: 'Recruiter Jane',
-          email: 'jane.recruiter@company.com',
-          phone: '+1 (555) 888-7777',
-          role: 'recruiter',
-        },
-        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWM0NTYiLCJuYW1lIjoiUmVjcnVpdGVyIEphbmUiLCJpYXQiOjE1MTYyMzkwMjJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-      })
+    mockSession = {
+      username: body.email,
+      authorities: [
+        { authority: isRecruiter ? 'ROLE_RECRUITER' : 'ROLE_CANDIDATE' }
+      ],
+    };
+
+    return HttpResponse.json(mockSession, {
+      headers: {
+        'Set-Cookie': 'JSESSIONID=mock-session-id; Path=/; HttpOnly',
+      },
+    });
+  }),
+
+  // Get current user (/auth/me)
+  http.get('http://localhost:3000/auth/me', () => {
+    console.log('Mock /auth/me called');
+
+    if (!mockSession) {
+      return new HttpResponse(null, { status: 401 });
     }
 
-    return HttpResponse.json({
-      user: {
-        id: 'user-456',
-        name: 'Jane Smith',
-        email: 'jane.smith@example.com',
-        phone: '+1 (555) 987-6543',
-        role: 'candidate',
-        experience: '3 years in frontend development',
-        skills: 'React, JavaScript, CSS',
+    return HttpResponse.json(mockSession);
+  }),
+
+  // Logout endpoint
+  http.post('http://localhost:3000/auth/logout', () => {
+    console.log('Mock logout called');
+    mockSession = null;
+
+    return new HttpResponse(null, {
+      status: 200,
+      headers: {
+        'Set-Cookie': 'JSESSIONID=; Path=/; Max-Age=0',
       },
-      token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ODc2NTQzMjEwIiwibmFtZSI6IkphbmUgU21pdGgiLCJpYXQiOjE1MTYyMzkwMjJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-    })
+    });
   }),
 
   // Get all vacancies
