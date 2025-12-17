@@ -44,7 +44,6 @@ public class SecurityConfig {
                         .requestMatchers("/hr/**").hasAnyRole("HR", "ADMIN")
                         // All other requests require authentication
                         .requestMatchers("/public/**").permitAll()
-                        .requestMatchers("/directions/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
