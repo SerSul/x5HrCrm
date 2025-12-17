@@ -39,7 +39,3 @@ services:
       traefik:
         condition: service_started
     restart: unless-stopped
-
-networks:
-  proxy:
-    driver: bridge

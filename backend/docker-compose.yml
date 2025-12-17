@@ -2,21 +2,88 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:16
+    image: postgres:16-alpine
     container_name: hr-automatization-db
     environment:
       POSTGRES_DB: hr_automatization
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - "5433:5432"
+      - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - hr-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  hr-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hr-automatization-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Database
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/hr_automatization
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+
+      # JPA/Hibernate
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: ${SHOW_SQL:-false}
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: true
+
+      # Liquibase (если используете)
+      SPRING_LIQUIBASE_ENABLED: ${LIQUIBASE_ENABLED:-true}
+      SPRING_LIQUIBASE_CHANGE_LOG: classpath:db/changelog/db.changelog-master.xml
+
+      # Session
+      SERVER_SERVLET_SESSION_TIMEOUT: -1
+      SERVER_SERVLET_SESSION_COOKIE_HTTP_ONLY: true
+      SERVER_SERVLET_SESSION_COOKIE_SECURE: false
+      SERVER_SERVLET_SESSION_COOKIE_SAME_SITE: strict
+
+      # Server
+      SERVER_PORT: 8080
+      SPRING_APPLICATION_NAME: hr-automatization
+
+      # Logging
+      LOGGING_LEVEL_ROOT: INFO
+      LOGGING_LEVEL_RU_X5TECH: ${LOG_LEVEL:-DEBUG}
+      LOGGING_LEVEL_ORG_HIBERNATE_SQL: ${SQL_LOG_LEVEL:-DEBUG}
+      LOGGING_LEVEL_ORG_HIBERNATE_TYPE_DESCRIPTOR_SQL_BASICBINDER: TRACE
+
+      # Security
+      SPRING_SECURITY_USER_NAME: ${ADMIN_USERNAME:-admin}
+      SPRING_SECURITY_USER_PASSWORD: ${ADMIN_PASSWORD:-admin}
+
+      # Profile
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE:-prod}
+
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    networks:
+      - hr-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
   postgres_data:
+    driver: local
 
 networks:
   hr-network:
