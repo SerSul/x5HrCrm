@@ -1,0 +1,43 @@
+# Dependencies (reinstalled in Docker)
+**/node_modules/
+**/bun.lockb
+
+# Build outputs
+**/dist/
+**/dist-ssr/
+**/*.tsbuildinfo
+
+# Tests
+**/playwright-report/
+**/test-results/
+**/e2e/
+**/.playwright-mcp/
+
+# Development files
+**/.env*
+**/*.log
+**/npm-debug.log*
+**/bun-debug.log*
+**/README.md
+**/CLAUDE.md
+**/MONOREPO.md
+
+# Editor
+**/.vscode/
+**/.idea/
+**/*.swp
+**/*.swo
+
+# OS
+**/.DS_Store
+**/Thumbs.db
+
+# MSW service worker (auto-generated, not needed in production)
+**/public/mockServiceWorker.js
+
+# Git
+.git/
+.gitignore
+
+# Claude temp files
+**/.claude/

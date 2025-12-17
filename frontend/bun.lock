@@ -12,6 +12,7 @@
       "name": "x5-bootcamp-client",
       "version": "0.0.0",
       "dependencies": {
+        "@gravity-ui/icons": "^2.16.0",
         "@gravity-ui/uikit": "^7.28.0",
         "@x5-bootcamp/ui-components": "workspace:*",
         "axios": "^1.13.2",
@@ -43,6 +44,7 @@
       "name": "recruiter-web",
       "version": "0.0.0",
       "dependencies": {
+        "@gravity-ui/icons": "^2.16.0",
         "@gravity-ui/uikit": "^7.28.0",
         "@x5-bootcamp/ui-components": "workspace:*",
         "axios": "^1.13.2",

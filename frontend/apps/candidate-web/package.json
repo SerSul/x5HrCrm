@@ -12,6 +12,7 @@
     "e2e:install": "bunx playwright install"
   },
   "dependencies": {
+    "@gravity-ui/icons": "^2.16.0",
     "@gravity-ui/uikit": "^7.28.0",
     "@x5-bootcamp/ui-components": "workspace:*",
     "axios": "^1.13.2",

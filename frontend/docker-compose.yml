@@ -1,0 +1,64 @@
+services:
+  traefik:
+    image: traefik:v3.6
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+
+      - "--providers.docker.network=proxy"
+      - "--entryPoints.web.address=:80"
+
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+
+      - "--log.level=INFO"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - proxy
+    restart: unless-stopped
+
+  candidate-web:
+    build:
+      context: .
+      dockerfile: apps/candidate-web/Dockerfile
+    labels:
+      # Enable Traefik for this service
+      - "traefik.enable=true"
+      # Define router
+      - "traefik.http.routers.candidate.rule=Host(`candidate.localhost`)"
+      - "traefik.http.routers.candidate.entrypoints=web"
+      # Define service
+      - "traefik.http.services.candidate.loadbalancer.server.port=80"
+    networks:
+      - proxy
+    depends_on:
+      traefik:
+        condition: service_started
+    restart: unless-stopped
+
+  recruiter-web:
+    build:
+      context: .
+      dockerfile: apps/recruiter-web/Dockerfile
+    labels:
+      # Enable Traefik for this service
+      - "traefik.enable=true"
+      # Define router
+      - "traefik.http.routers.recruiter.rule=Host(`recruiter.localhost`)"
+      - "traefik.http.routers.recruiter.entrypoints=web"
+      # Define service
+      - "traefik.http.services.recruiter.loadbalancer.server.port=80"
+    networks:
+      - proxy
+    depends_on:
+      traefik:
+        condition: service_started
+    restart: unless-stopped
+
+networks:
+  proxy:
+    driver: bridge
