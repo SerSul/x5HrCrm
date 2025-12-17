@@ -23,7 +23,7 @@ services:
 
   candidate-web:
     build:
-      context: ./frontend
+      context: .
       dockerfile: apps/candidate-web/Dockerfile
     labels:
       # Enable Traefik for this service
@@ -42,7 +42,7 @@ services:
 
   recruiter-web:
     build:
-      context: ./frontend
+      context: .
       dockerfile: apps/recruiter-web/Dockerfile
     labels:
       # Enable Traefik for this service
