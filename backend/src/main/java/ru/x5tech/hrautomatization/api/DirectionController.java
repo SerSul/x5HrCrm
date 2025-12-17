@@ -23,7 +23,6 @@ import java.util.List;
  * </strong>
  */
 @RestController
-@RequestMapping("/directions")
 @RequiredArgsConstructor
 @Tag(name = "Directions", description = "Работа с направлениями")
 public class DirectionController {
@@ -47,11 +46,11 @@ public class DirectionController {
             )
     )
 
-    @GetMapping
+    @GetMapping("/public/directions")
     public ResponseEntity<List<DirectionResponse>> getDirections(
             @Parameter(description = "Фильтровать только направления, куда подался текущий пользователь",
                     required = false)
-            @RequestParam(name = "onlyApplied", required = false, defaultValue = "false")
+            @RequestParam(name = "only_applied", required = false, defaultValue = "false")
             boolean onlyApplied
     ) {
         return ResponseEntity.ok(directionService.getDirections(onlyApplied));

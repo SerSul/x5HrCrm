@@ -20,5 +20,4 @@
             <column name="min_score" type="INTEGER"/>
         </createTable>
     </changeSet>
-
 </databaseChangeLog>

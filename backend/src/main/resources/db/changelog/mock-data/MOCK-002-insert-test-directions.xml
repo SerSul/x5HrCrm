@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <changeSet id="004-insert-test-directions" author="laplas7">
+        <comment>Тестовые направления для IT</comment>
+
+        <insert tableName="directions">
+            <column name="title"       value="Junior Java Developer"/>
+            <column name="description" value="Стажёр/Junior Java разработчик в IT-команду"/>
+            <column name="is_active"   valueBoolean="true"/>
+            <column name="created_at"  valueDate="2025-01-01T10:00:00"/>
+        </insert>
+
+        <insert tableName="directions">
+            <column name="title"       value="Middle Java Developer"/>
+            <column name="description" value="Middle Java разработчик в продуктовую команду IT"/>
+            <column name="is_active"   valueBoolean="true"/>
+            <column name="created_at"  valueDate="2025-01-01T10:05:00"/>
+        </insert>
+
+        <insert tableName="directions">
+            <column name="title"       value="DevOps Engineer"/>
+            <column name="description" value="Инженер DevOps / платформенная команда IT"/>
+            <column name="is_active"   valueBoolean="true"/>
+            <column name="created_at"  valueDate="2025-01-01T10:10:00"/>
+        </insert>
+
+        <insert tableName="directions">
+            <column name="title"       value="QA Automation Engineer"/>
+            <column name="description" value="Автоматизатор тестирования (Java/Selenium) в IT-направление"/>
+            <column name="is_active"   valueBoolean="true"/>
+            <column name="created_at"  valueDate="2025-01-01T10:15:00"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
