@@ -2,8 +2,8 @@ import { Text, Card, Checkbox, Button, Spin } from '@gravity-ui/uikit';
 import { Xmark } from '@gravity-ui/icons';
 import { useNavigate } from 'react-router';
 import type { Application } from '../../api/applicationApi';
-import ApplicationStatusBadge from '../ApplicationStatusBadge/ApplicationStatusBadge';
 import styles from './ApplicationSidebar.module.scss';
+import { ApplicationStatusBadge } from '@shared/ui/index';
 
 interface ApplicationSidebarProps {
   applications: Application[];

@@ -21,21 +21,44 @@ services:
       - proxy
     restart: unless-stopped
 
-  frontend:
+  candidate-web:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: apps/candidate-web/Dockerfile
     labels:
       # Enable Traefik for this service
       - "traefik.enable=true"
       # Define router
-      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
-      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.routers.candidate.rule=Host(`candidate.localhost`)"
+      - "traefik.http.routers.candidate.entrypoints=web"
       # Define service
-      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      - "traefik.http.services.candidate.loadbalancer.server.port=80"
     networks:
       - proxy
     depends_on:
       traefik:
         condition: service_started
     restart: unless-stopped
+
+  recruiter-web:
+    build:
+      context: ./frontend
+      dockerfile: apps/recruiter-web/Dockerfile
+    labels:
+      # Enable Traefik for this service
+      - "traefik.enable=true"
+      # Define router
+      - "traefik.http.routers.recruiter.rule=Host(`recruiter.localhost`)"
+      - "traefik.http.routers.recruiter.entrypoints=web"
+      # Define service
+      - "traefik.http.services.recruiter.loadbalancer.server.port=80"
+    networks:
+      - proxy
+    depends_on:
+      traefik:
+        condition: service_started
+    restart: unless-stopped
+
+networks:
+  proxy:
+    driver: bridge
