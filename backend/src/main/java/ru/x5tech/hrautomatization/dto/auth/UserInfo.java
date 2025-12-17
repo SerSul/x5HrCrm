@@ -1,12 +1,16 @@
 package ru.x5tech.hrautomatization.dto.auth;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * <br>
- * <strong>
  * Author: Дмитрий Николаенков (laplas7)
  * Creation date: 17.12.2025 19:21
- * </strong>
  */
-public record UserInfo(String username, Object authorities) {}
+@Schema(description = "Информация о пользователе")
+public record UserInfo(
+        @Schema(description = "Имя пользователя (email)", example = "user@example.com")
+        String username,
 
+        @Schema(description = "Права доступа и роли пользователя", example = "[{\"authority\": \"ROLE_USER\"}]")
+        Object authorities
+) {}
