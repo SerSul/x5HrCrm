@@ -13,7 +13,7 @@ public interface DirectionRepository extends JpaRepository<Direction, Long> {
            select distinct d
            from Direction d
            join d.applications a
-           where a.applicant.id = :userId
+           where a.user.id = :userId
            """)
     List<Direction> findAllByApplicantId(@Param("userId") Long userId);
 }

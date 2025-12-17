@@ -10,7 +10,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.x5tech.hrautomatization.dto.DirectionResponse;
+import ru.x5tech.hrautomatization.dto.direction.DirectionInfoResponse;
+import ru.x5tech.hrautomatization.dto.direction.DirectionResponse;
 import ru.x5tech.hrautomatization.service.DirectionService;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.List;
  * </strong>
  */
 @RestController
+@RequestMapping("/directions")
 @RequiredArgsConstructor
 @Tag(name = "Directions", description = "Работа с направлениями")
 public class DirectionController {
@@ -46,7 +48,7 @@ public class DirectionController {
             )
     )
 
-    @GetMapping("/public/directions")
+    @GetMapping
     public ResponseEntity<List<DirectionResponse>> getDirections(
             @Parameter(description = "Фильтровать только направления, куда подался текущий пользователь",
                     required = false)
@@ -56,4 +58,8 @@ public class DirectionController {
         return ResponseEntity.ok(directionService.getDirections(onlyApplied));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<DirectionInfoResponse> getDirectionData(@PathVariable Long id) {
+        return ResponseEntity.ok(directionService.getDirection(id));
+    }
 }

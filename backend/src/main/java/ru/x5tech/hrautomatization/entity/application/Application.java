@@ -35,7 +35,7 @@ public class Application {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    private User applicant;
+    private User user;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "direction_id", nullable = false)

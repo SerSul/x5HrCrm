@@ -2,7 +2,7 @@ package ru.x5tech.hrautomatization.mapper;
 
 
 import org.mapstruct.Mapper;
-import ru.x5tech.hrautomatization.dto.DirectionResponse;
+import ru.x5tech.hrautomatization.dto.direction.DirectionResponse;
 import ru.x5tech.hrautomatization.entity.application.Direction;
 
 /**
