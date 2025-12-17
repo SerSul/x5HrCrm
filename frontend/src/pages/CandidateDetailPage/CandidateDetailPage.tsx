@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router';
-import { Spin, Card } from '@gravity-ui/uikit';
+import { Spin, Card, Text } from '@gravity-ui/uikit';
 import { useCandidateStore } from '../../storage/candidateStorage';
 import styles from './CandidateDetailPage.module.scss';
 
@@ -19,30 +19,39 @@ const CandidateDetailPage = () => {
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <Text variant="body-1">Ошибка: {error}</Text>;
   }
 
   if (!selectedCandidate) {
-    return <div>Candidate not found</div>;
+    return <Text variant="body-1">Кандидат не найден</Text>;
   }
 
   return (
     <div>
-      <h1>Candidate Details</h1>
+      <Text variant="display-2">Информация о кандидате</Text>
       <Card className={styles.card}>
-        <h2>{selectedCandidate.name}</h2>
+        <Text variant="display-1">{selectedCandidate.name}</Text>
         <div className={styles.contactInfo}>
-          <p><strong>Email:</strong> {selectedCandidate.email}</p>
-          <p><strong>Phone:</strong> {selectedCandidate.phone}</p>
-          <p><strong>ID:</strong> {selectedCandidate.id}</p>
+          <div className={styles.contactItem}>
+            <Text variant="subheader-1" color="secondary">Электронная почта</Text>
+            <Text variant="body-2">{selectedCandidate.email}</Text>
+          </div>
+          <div className={styles.contactItem}>
+            <Text variant="subheader-1" color="secondary">Телефон</Text>
+            <Text variant="body-2">{selectedCandidate.phone}</Text>
+          </div>
+          <div className={styles.contactItem}>
+            <Text variant="subheader-1" color="secondary">ID</Text>
+            <Text variant="body-2">{selectedCandidate.id}</Text>
+          </div>
         </div>
         <div className={styles.experienceSection}>
-          <h3>Experience</h3>
-          <p>{selectedCandidate.experience}</p>
+          <Text variant="header-2">Опыт работы</Text>
+          <Text variant="body-1">{selectedCandidate.experience}</Text>
         </div>
         <div className={styles.skillsSection}>
-          <h3>Skills</h3>
-          <p>{selectedCandidate.skills}</p>
+          <Text variant="header-2">Навыки</Text>
+          <Text variant="body-1">{selectedCandidate.skills}</Text>
         </div>
       </Card>
     </div>

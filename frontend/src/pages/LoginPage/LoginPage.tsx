@@ -1,4 +1,4 @@
-import { Button, Card, TextInput } from '@gravity-ui/uikit';
+import { Button, Card, TextInput, Text } from '@gravity-ui/uikit';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuthStore } from '../../storage/authStorage';
@@ -23,18 +23,18 @@ const LoginPage = () => {
     <div className={styles.page}>
       <div className={styles.container}>
         <Card className={styles.card}>
-          <h1 className={styles.title}>Login</h1>
+          <Text variant="display-2" className={styles.title}>Вход</Text>
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.field}>
               <TextInput
-                placeholder="Login"
+                placeholder="Логин"
                 value={login}
                 onChange={(e) => setLogin(e.target.value)}
               />
             </div>
             <div className={styles.field}>
               <TextInput
-                placeholder="Password"
+                placeholder="Пароль"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -42,15 +42,15 @@ const LoginPage = () => {
             </div>
             <div className={styles.actions}>
               <Button type="submit" className={styles.submitButton}>
-                Login
+                Вход
               </Button>
             </div>
-            {user && <p className={styles.successMessage}>Successfully logged in!</p>}
+            {user && <Text variant="body-1" className={styles.successMessage}>Вы успешно вошли!</Text>}
           </form>
           <div className={styles.footer}>
-            <p>
-              Don't have an account? <Link to="/register" variant="inline">Register here</Link>
-            </p>
+            <Text variant="body-2">
+              Нет аккаунта? <Link to="/register" variant="inline">Зарегистрируйтесь здесь</Link>
+            </Text>
           </div>
         </Card>
       </div>

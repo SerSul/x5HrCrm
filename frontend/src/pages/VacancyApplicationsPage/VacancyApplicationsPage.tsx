@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router';
-import { Spin } from '@gravity-ui/uikit';
+import { Spin, Text } from '@gravity-ui/uikit';
 import { useApplicationStore } from '../../storage/applicationStorage';
 import ApplicationCard from '../../components/ApplicationCard/ApplicationCard';
 import styles from './VacancyApplicationsPage.module.scss';
@@ -24,14 +24,14 @@ const VacancyApplicationsPage = () => {
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <Text variant="body-1">Ошибка: {error}</Text>;
   }
 
   return (
     <div>
-      <h1>Applications for this Vacancy</h1>
+      <Text variant="display-2">Отклики на вакансию</Text>
       {applications.length === 0 ? (
-        <p>No applications yet for this vacancy.</p>
+        <Text variant="body-1">Пока нет откликов на эту вакансию.</Text>
       ) : (
         <div className={styles.applicationsList}>
           {applications.map((application) => (

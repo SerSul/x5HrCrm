@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Spin } from '@gravity-ui/uikit';
+import { Spin, Text } from '@gravity-ui/uikit';
 import { useApplicationStore } from '../../storage/applicationStorage';
 import ApplicationCard from '../../components/ApplicationCard/ApplicationCard';
 import styles from './MyApplicationsPage.module.scss';
@@ -16,14 +16,14 @@ const MyApplicationsPage = () => {
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <Text variant="body-1">Ошибка: {error}</Text>;
   }
 
   return (
     <div>
-      <h1>My Applications</h1>
+      <Text variant="display-2">Мои отклики</Text>
       {applications.length === 0 ? (
-        <p>You haven't applied to any positions yet.</p>
+        <Text variant="body-1">Вы еще не откликались на вакансии.</Text>
       ) : (
         <div className={styles.applicationsList}>
           {applications.map((application) => (

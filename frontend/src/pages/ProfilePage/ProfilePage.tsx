@@ -30,61 +30,61 @@ const ProfilePage = () => {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.title}>My Profile</h1>
+        <Text variant="display-2" className={styles.title}>Мой профиль</Text>
         {user.role === 'candidate' && !isEditing && (
-          <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
+          <Button onClick={() => setIsEditing(true)}>Редактировать профиль</Button>
         )}
       </div>
       <Card className={styles.card}>
         <div className={styles.field}>
-          <Text variant="subheader-1" color="secondary">Name</Text>
+          <Text variant="subheader-1" color="secondary">Имя</Text>
           <Text variant="body-2">{user.name}</Text>
         </div>
         <div className={styles.field}>
-          <Text variant="subheader-1" color="secondary">Email</Text>
+          <Text variant="subheader-1" color="secondary">Электронная почта</Text>
           <Text variant="body-2">{user.email}</Text>
         </div>
         <div className={styles.field}>
-          <Text variant="subheader-1" color="secondary">Phone</Text>
+          <Text variant="subheader-1" color="secondary">Телефон</Text>
           <Text variant="body-2">{user.phone}</Text>
         </div>
         <div className={styles.field}>
-          <Text variant="subheader-1" color="secondary">Role</Text>
-          <Text variant="body-2">{user.role === 'candidate' ? 'Candidate' : 'Recruiter'}</Text>
+          <Text variant="subheader-1" color="secondary">Роль</Text>
+          <Text variant="body-2">{user.role === 'candidate' ? 'Кандидат' : 'Рекрутер'}</Text>
         </div>
         {user.role === 'candidate' && (
           <>
             <div className={styles.field}>
-              <Text variant="subheader-1" color="secondary">Experience</Text>
+              <Text variant="subheader-1" color="secondary">Опыт работы</Text>
               {isEditing ? (
                 <TextArea
                   value={experience}
                   onChange={(e) => setExperience(e.target.value)}
-                  placeholder="Describe your work experience"
+                  placeholder="Опишите ваш опыт работы"
                   rows={4}
                 />
               ) : (
-                <Text variant="body-2">{user.experience || 'Not provided'}</Text>
+                <Text variant="body-2">{user.experience || 'Не указано'}</Text>
               )}
             </div>
             <div className={styles.field}>
-              <Text variant="subheader-1" color="secondary">Skills</Text>
+              <Text variant="subheader-1" color="secondary">Навыки</Text>
               {isEditing ? (
                 <TextInput
                   value={skills}
                   onChange={(e) => setSkills(e.target.value)}
-                  placeholder="e.g. React, TypeScript, Node.js"
+                  placeholder="напр. React, TypeScript, Node.js"
                 />
               ) : (
-                <Text variant="body-2">{user.skills || 'Not provided'}</Text>
+                <Text variant="body-2">{user.skills || 'Не указано'}</Text>
               )}
             </div>
           </>
         )}
         {isEditing && (
           <div className={styles.actions}>
-            <Button view="action" onClick={handleSave}>Save</Button>
-            <Button onClick={handleCancel}>Cancel</Button>
+            <Button view="action" onClick={handleSave}>Сохранить</Button>
+            <Button onClick={handleCancel}>Отмена</Button>
           </div>
         )}
       </Card>

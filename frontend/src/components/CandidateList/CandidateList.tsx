@@ -5,6 +5,7 @@ import {
   withTableSettings,
   Flex,
   Spin,
+  Text,
   type TableSettingsData,
 } from '@gravity-ui/uikit';
 // import { useNavigate } from 'react-router';
@@ -38,14 +39,14 @@ const CandidateList = () => {
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <Text variant="body-1">Ошибка: {error}</Text>;
   }
 
   return (
     <div>
-      <h2>All Candidates</h2>
+      <Text variant="display-1">Все кандидаты</Text>
       {candidates.length === 0 ? (
-        <p>No candidates available</p>
+        <Text variant="body-1">Нет доступных кандидатов</Text>
       ) : (
         <div className={styles.candidateList}>
           <MyTable
@@ -68,7 +69,7 @@ const CandidateList = () => {
                     ]);
                   }}
                 >
-                  Reset
+                  Сбросить
                 </Button>
                 <DefaultApplyButton />
               </Flex>

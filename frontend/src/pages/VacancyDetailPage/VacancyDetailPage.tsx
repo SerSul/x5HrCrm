@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { Spin, Card, Button } from '@gravity-ui/uikit';
+import { Spin, Card, Button, Text } from '@gravity-ui/uikit';
 import { fetchVacancyByIdRequest } from '../../api/vacancyApi';
 import { useApplicationStore } from '../../storage/applicationStorage';
 import type { Vacancy } from '../../api/vacancyApi';
@@ -40,33 +40,45 @@ const VacancyDetailPage = () => {
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <Text variant="body-1">Ошибка: {error}</Text>;
   }
 
   if (!vacancy) {
-    return <div>Vacancy not found</div>;
+    return <Text variant="body-1">Вакансия не найдена</Text>;
   }
 
   return (
     <div>
-      <h1>{vacancy.title}</h1>
+      <Text variant="display-2">{vacancy.title}</Text>
       <Card className={styles.card}>
         <div className={styles.details}>
-          <p><strong>Company:</strong> {vacancy.company}</p>
-          <p><strong>Location:</strong> {vacancy.location}</p>
-          <p><strong>Type:</strong> {vacancy.type}</p>
-          <p><strong>Salary:</strong> {vacancy.salary}</p>
+          <div className={styles.detailItem}>
+            <Text variant="subheader-1" color="secondary">Компания</Text>
+            <Text variant="body-2">{vacancy.company}</Text>
+          </div>
+          <div className={styles.detailItem}>
+            <Text variant="subheader-1" color="secondary">Местоположение</Text>
+            <Text variant="body-2">{vacancy.location}</Text>
+          </div>
+          <div className={styles.detailItem}>
+            <Text variant="subheader-1" color="secondary">Тип занятости</Text>
+            <Text variant="body-2">{vacancy.type}</Text>
+          </div>
+          <div className={styles.detailItem}>
+            <Text variant="subheader-1" color="secondary">Зарплата</Text>
+            <Text variant="body-2">{vacancy.salary}</Text>
+          </div>
         </div>
         <div className={styles.description}>
-          <h3>Job Description</h3>
-          <p>{vacancy.description}</p>
+          <Text variant="header-2">Описание вакансии</Text>
+          <Text variant="body-1">{vacancy.description}</Text>
         </div>
         <div className={styles.applySection}>
           {hasApplied ? (
-            <p className={styles.appliedMessage}>You have already applied to this position</p>
+            <Text variant="body-1" className={styles.appliedMessage}>Вы уже откликнулись на эту вакансию</Text>
           ) : (
             <Button size="l" view="action" onClick={handleApply}>
-              Apply Now
+              Откликнуться
             </Button>
           )}
         </div>

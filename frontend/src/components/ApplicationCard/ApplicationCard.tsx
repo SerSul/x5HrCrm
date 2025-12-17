@@ -1,4 +1,4 @@
-import { Card, Button } from '@gravity-ui/uikit';
+import { Card, Button, Text } from '@gravity-ui/uikit';
 import ApplicationStatusBadge from '../ApplicationStatusBadge/ApplicationStatusBadge';
 import type { Application } from '../../api/applicationApi';
 import styles from './ApplicationCard.module.scss';
@@ -14,10 +14,19 @@ const ApplicationCard = ({ application, showActions = false, onStatusChange }: A
     <Card className={styles.card}>
       <div className={styles.header}>
         <div>
-          <h3>{application.vacancyTitle}</h3>
-          <p><strong>Candidate:</strong> {application.candidateName}</p>
-          <p><strong>Email:</strong> {application.candidateEmail}</p>
-          <p><strong>Applied:</strong> {new Date(application.appliedAt).toLocaleDateString()}</p>
+          <Text variant="header-2">{application.vacancyTitle}</Text>
+          <div className={styles.metaItem}>
+            <Text variant="subheader-1" color="secondary" as="span">Кандидат:</Text>{' '}
+            <Text variant="body-2" as="span">{application.candidateName}</Text>
+          </div>
+          <div className={styles.metaItem}>
+            <Text variant="subheader-1" color="secondary" as="span">Электронная почта:</Text>{' '}
+            <Text variant="body-2" as="span">{application.candidateEmail}</Text>
+          </div>
+          <div className={styles.metaItem}>
+            <Text variant="subheader-1" color="secondary" as="span">Дата отклика:</Text>{' '}
+            <Text variant="body-2" as="span">{new Date(application.appliedAt).toLocaleDateString('ru-RU')}</Text>
+          </div>
         </div>
         <ApplicationStatusBadge status={application.status} />
       </div>
@@ -25,14 +34,14 @@ const ApplicationCard = ({ application, showActions = false, onStatusChange }: A
         <div className={styles.actions}>
           {application.status === 'pending' && (
             <Button onClick={() => onStatusChange(application.id, 'reviewed')}>
-              Mark as Reviewed
+              Отметить как просмотренное
             </Button>
           )}
           <Button view="action" onClick={() => onStatusChange(application.id, 'accepted')}>
-            Accept
+            Принять
           </Button>
           <Button view="flat-danger" onClick={() => onStatusChange(application.id, 'rejected')}>
-            Reject
+            Отклонить
           </Button>
         </div>
       )}

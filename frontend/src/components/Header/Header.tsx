@@ -1,4 +1,4 @@
-import { Button } from '@gravity-ui/uikit';
+import { Button, Text } from '@gravity-ui/uikit';
 import { useNavigate } from 'react-router';
 import { useAuthStore } from '../../storage/authStorage';
 import Link from '../Link/Link';
@@ -21,16 +21,16 @@ const Header = () => {
           {user?.role === 'candidate' && (
             <>
               <Link to="/candidate" variant="nav">
-                Home
+                Главная
               </Link>
               <Link to="/candidate/applications" variant="nav">
-                My Applications
+                Мои отклики
               </Link>
             </>
           )}
           {user?.role === 'recruiter' && (
             <Link to="/recruiter" variant="nav">
-              Candidates
+              Кандидаты
             </Link>
           )}
         </div>
@@ -41,20 +41,22 @@ const Header = () => {
                 to={user.role === 'candidate' ? '/candidate/profile' : '/recruiter/profile'}
                 variant="nav"
               >
-                Profile
+                Профиль
               </Link>
-              <span className={styles.userGreeting}>Welcome, {user.name}</span>
+              <Text variant="body-2" className={styles.userGreeting}>
+                Добро пожаловать, {user.name}
+              </Text>
               <Button view="flat" onClick={handleLogout} className={styles.logoutButton}>
-                Logout
+                Выход
               </Button>
             </>
           ) : (
             <>
               <Link to="/login" variant="nav">
-                Login
+                Вход
               </Link>
               <Link to="/register" variant="nav">
-                Register
+                Регистрация
               </Link>
             </>
           )}

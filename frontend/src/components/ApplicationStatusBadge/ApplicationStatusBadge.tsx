@@ -13,10 +13,10 @@ const ApplicationStatusBadge = ({ status }: ApplicationStatusBadgeProps) => {
   };
 
   const labelMap = {
-    pending: 'Pending',
-    reviewed: 'Reviewed',
-    accepted: 'Accepted',
-    rejected: 'Rejected',
+    pending: 'На рассмотрении',
+    reviewed: 'Просмотрено',
+    accepted: 'Принято',
+    rejected: 'Отклонено',
   };
 
   return <Label theme={themeMap[status]}>{labelMap[status]}</Label>;

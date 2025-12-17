@@ -7,6 +7,13 @@
   margin-bottom: 1rem;
 }
 
+.detailItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
 .description {
   margin-top: 1.5rem;
 }
