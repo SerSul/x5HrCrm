@@ -19,5 +19,5 @@
             <column name="description" value="Administrator role"/>
         </insert>
     </changeSet>
-
+3
 </databaseChangeLog>
