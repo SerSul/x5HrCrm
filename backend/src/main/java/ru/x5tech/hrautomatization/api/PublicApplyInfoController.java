@@ -11,7 +11,7 @@ import ru.x5tech.hrautomatization.dto.direction.ApplyInfoResponse;
 import ru.x5tech.hrautomatization.service.DirectionService;
 
 @RestController
-@RequestMapping("/public/apply-info")
+@RequestMapping("/apply-info")
 @RequiredArgsConstructor
 @Tag(name = "Public Apply Info", description = "🔓 Информация по отклику (apply) на направление")
 public class PublicApplyInfoController {

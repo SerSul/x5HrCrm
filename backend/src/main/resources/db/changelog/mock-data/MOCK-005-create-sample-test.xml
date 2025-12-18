@@ -22,7 +22,7 @@
         <insert tableName="questions">
             <column name="test_id"
                     valueComputed="(SELECT id FROM tests WHERE title='Универсальный тест для разработчиков')"/>
-            <column name="test_difficulty" valueNumeric="1"/>
+            <column name="test_difficulty" valueNumeric="10"/>
             <column name="text" value="Какой модификатор доступа по умолчанию в Java для класса?"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
@@ -58,7 +58,7 @@
         <insert tableName="questions">
             <column name="test_id"
                     valueComputed="(SELECT id FROM tests WHERE title='Универсальный тест для разработчиков')"/>
-            <column name="test_difficulty" valueNumeric="2"/>
+            <column name="test_difficulty" valueNumeric="10"/>
             <column name="text" value="Какая аннотация используется для создания REST контроллера в Spring Boot?"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
@@ -94,7 +94,7 @@
         <insert tableName="questions">
             <column name="test_id"
                     valueComputed="(SELECT id FROM tests WHERE title='Универсальный тест для разработчиков')"/>
-            <column name="test_difficulty" valueNumeric="2"/>
+            <column name="test_difficulty" valueNumeric="10"/>
             <column name="text" value="Что такое JOIN в SQL?"/>
             <column name="order_index" valueNumeric="3"/>
         </insert>
@@ -130,7 +130,7 @@
         <insert tableName="questions">
             <column name="test_id"
                     valueComputed="(SELECT id FROM tests WHERE title='Универсальный тест для разработчиков')"/>
-            <column name="test_difficulty" valueNumeric="3"/>
+            <column name="test_difficulty" valueNumeric="10"/>
             <column name="text" value="Какой HTTP статус код означает 'Создано успешно'?"/>
             <column name="order_index" valueNumeric="4"/>
         </insert>
