@@ -95,8 +95,8 @@ public class TestService {
         Map<Long, Question> questionMap = test.getQuestions().stream()
                 .collect(Collectors.toMap(Question::getId, q -> q));
 
-        // Сохранение ответов и подсчет баллов
-        List<TestAnswer> answers = new ArrayList<>();
+        attempt.getAnswers().clear();
+
         int totalScore = 0;
 
         for (TestAnswerDto answerDto : req.answers()) {
@@ -115,14 +115,14 @@ public class TestService {
                     .attempt(attempt)
                     .selectedOption(selectedOption)
                     .build();
-            answers.add(testAnswer);
+
+            attempt.getAnswers().add(testAnswer);
 
             if (selectedOption.isCorrect()) {
                 totalScore += question.getTestDifficulty();
             }
         }
 
-        attempt.setAnswers(answers);
         attempt.setScore(totalScore);
         attempt.setFinishedAt(LocalDateTime.now());
         attempt.setStatus(TestAttemptStatus.FINISHED);
@@ -146,6 +146,7 @@ public class TestService {
         );
     }
 
+
     @Transactional(readOnly = true)
     public TestStartResponse getQuestions(Long attemptId) {
         Long currentUserId = userContext.requireUserId();
@@ -153,7 +154,6 @@ public class TestService {
         TestAttempt attempt = testAttemptRepository.findById(attemptId)
                 .orElseThrow(() -> new NotFoundException("Попытка теста не найдена"));
 
-        // ✅ Проверки доступа и статуса
         if (!attempt.getUser().getId().equals(currentUserId)) {
             throw new ConflictException("Нельзя смотреть чужой тест");
         }
