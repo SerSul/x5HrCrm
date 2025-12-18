@@ -42,9 +42,26 @@ public class HrApplicationService {
             throw new ConflictException("Заявка уже находится в этом статусе");
         }
 
-        Long hrUserId = userContext.requireUserId();
+        var hrUserId = userContext.requireUserId();
         var hrUser = userRepository.findById(hrUserId)
                 .orElseThrow(() -> new NotFoundException("HR пользователь не найден"));
+
+        Integer currentOrder = app.getCurrentDirectionStatus().getSequenceOrder();
+        Integer targetOrder = targetStatus.getSequenceOrder();
+
+        if (targetOrder <= currentOrder) {
+            throw new ConflictException("Нельзя откатывать статус назад (current=" + currentOrder + ", target=" + targetOrder + ")");
+        }
+
+        boolean skippedMandatory = directionStatusRepository.existsMandatoryBetween(
+                app.getDirection(),
+                currentOrder,
+                targetOrder
+        );
+
+        if (skippedMandatory) {
+            throw new ConflictException("Нельзя пропускать обязательные статусы между " + currentOrder + " и " + targetOrder);
+        }
 
         LocalDateTime now = LocalDateTime.now();
         String comment = (req.comment() == null || req.comment().isBlank())

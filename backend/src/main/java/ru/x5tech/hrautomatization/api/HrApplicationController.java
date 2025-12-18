@@ -17,10 +17,10 @@ public class HrApplicationController {
 
     private final HrApplicationService hrApplicationService;
 
-    @Operation(summary = "🧑‍💼 Сменить статус заявки (всё в JSON body, snake_case). Успех: 204 No Content")
+    @Operation(summary = "Сменить статус заявки.")
     @PostMapping("/status")
     public ResponseEntity<Void> moveToStatus(@Valid @RequestBody MoveApplicationStatusRequest request) {
         hrApplicationService.moveToStatus(request);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }

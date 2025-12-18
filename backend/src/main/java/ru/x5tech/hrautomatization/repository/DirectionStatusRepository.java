@@ -6,6 +6,8 @@ import org.springframework.stereotype.Repository;
 import ru.x5tech.hrautomatization.entity.application.Direction;
 import ru.x5tech.hrautomatization.entity.application.DirectionStatus;
 import ru.x5tech.hrautomatization.entity.user.PersonalData;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -18,6 +20,20 @@ import java.util.Optional;
  */
 @Repository
 public interface DirectionStatusRepository extends JpaRepository<DirectionStatus, Long> {
+
+    @Query("""
+        select (count(ds) > 0)
+        from DirectionStatus ds
+        where ds.direction = :direction
+          and ds.mandatory = true
+          and ds.sequenceOrder > :fromOrder
+          and ds.sequenceOrder < :toOrder
+    """)
+    boolean existsMandatoryBetween(
+            @Param("direction") Direction direction,
+            @Param("fromOrder") Integer fromOrder,
+            @Param("toOrder") Integer toOrder
+    );
 
     Optional<DirectionStatus> findByDirectionAndSequenceOrder(Direction direction, Integer sequenceOrder);
 }
