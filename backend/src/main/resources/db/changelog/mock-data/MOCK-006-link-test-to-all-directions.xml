@@ -1,16 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <changeSet id="MOCK-013-link-test-to-directions" author="laplas7">
-        <comment>Привязываем универсальный тест (ID=1) ко всем существующим направлениям</comment>
-
-        <update tableName="directions">
-            <column name="test_id" valueNumeric="1"/>
-            <where> test_id IS NULL OR test_id = 0 </where>
-        </update>
+    <changeSet id="MOCK-006-link-test-to-all-directions" author="laplas7">
+        <sql dbms="postgresql">
+            UPDATE directions
+            SET test_id = (SELECT id FROM tests WHERE title='Универсальный тест для разработчиков')
+            WHERE test_id IS NULL;
+        </sql>
     </changeSet>
 
 </databaseChangeLog>

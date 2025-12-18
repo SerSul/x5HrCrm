@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -5,11 +6,9 @@
           http://www.liquibase.org/xml/ns/dbchangelog
           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.21.xsd">
 
-
-    <!-- 2. PersonalData для трёх пользователей -->
-    <changeSet id="2025-12-18-personal-data-seed" author="laplas7">
+    <!-- PersonalData -->
+    <changeSet id="MOCK-004-01-personal-data-seed" author="laplas7">
         <insert tableName="personal_data">
-            <column name="id" valueNumeric="1"/>
             <column name="person_guid" value="00000000-0000-0000-0000-000000000001"/>
             <column name="first_name" value="Admin"/>
             <column name="last_name" value="User"/>
@@ -17,7 +16,6 @@
         </insert>
 
         <insert tableName="personal_data">
-            <column name="id" valueNumeric="2"/>
             <column name="person_guid" value="00000000-0000-0000-0000-000000000002"/>
             <column name="first_name" value="Helen"/>
             <column name="last_name" value="Hr"/>
@@ -25,7 +23,6 @@
         </insert>
 
         <insert tableName="personal_data">
-            <column name="id" valueNumeric="3"/>
             <column name="person_guid" value="00000000-0000-0000-0000-000000000003"/>
             <column name="first_name" value="John"/>
             <column name="last_name" value="Doe"/>
@@ -33,68 +30,68 @@
         </insert>
     </changeSet>
 
-    <!-- 3. Users (пароли нужно заменить на реальные BCrypt) -->
-    <changeSet id="2025-12-18-users-seed" author="laplas7">
+    <!-- Users -->
+    <changeSet id="MOCK-004-02-users-seed" author="laplas7">
         <!-- admin -->
         <insert tableName="users">
-            <column name="id" valueNumeric="1"/>
             <column name="email" value="admin@example.com"/>
             <column name="password"
-                    value="$2a$10$0WI3WQUYYME7HzNefRUGFOvTsR1qHeQsh4bqCxdESzijSeGE0gHwS"/> <!-- TODO: подставь свой bcrypt -->
+                    value="$2a$10$0WI3WQUYYME7HzNefRUGFOvTsR1qHeQsh4bqCxdESzijSeGE0gHwS"/>
             <column name="phone" value="+70000000001"/>
             <column name="enabled" valueBoolean="true"/>
-            <column name="personal_data_id" valueNumeric="1"/>
+            <column name="personal_data_id"
+                    valueComputed="(SELECT id FROM personal_data WHERE person_guid='00000000-0000-0000-0000-000000000001')"/>
         </insert>
 
         <!-- hr -->
         <insert tableName="users">
-            <column name="id" valueNumeric="2"/>
             <column name="email" value="hr@example.com"/>
             <column name="password"
-                    value="$2a$10$0WI3WQUYYME7HzNefRUGFOvTsR1qHeQsh4bqCxdESzijSeGE0gHwS"/> <!-- тот же или другой bcrypt -->
+                    value="$2a$10$0WI3WQUYYME7HzNefRUGFOvTsR1qHeQsh4bqCxdESzijSeGE0gHwS"/>
             <column name="phone" value="+70000000002"/>
             <column name="enabled" valueBoolean="true"/>
-            <column name="personal_data_id" valueNumeric="2"/>
+            <column name="personal_data_id"
+                    valueComputed="(SELECT id FROM personal_data WHERE person_guid='00000000-0000-0000-0000-000000000002')"/>
         </insert>
 
-        <!-- обычный пользователь -->
+        <!-- user -->
         <insert tableName="users">
-            <column name="id" valueNumeric="3"/>
             <column name="email" value="user@example.com"/>
             <column name="password"
                     value="$2a$10$0WI3WQUYYME7HzNefRUGFOvTsR1qHeQsh4bqCxdESzijSeGE0gHwS"/>
             <column name="phone" value="+70000000003"/>
             <column name="enabled" valueBoolean="true"/>
-            <column name="personal_data_id" valueNumeric="3"/>
+            <column name="personal_data_id"
+                    valueComputed="(SELECT id FROM personal_data WHERE person_guid='00000000-0000-0000-0000-000000000003')"/>
         </insert>
     </changeSet>
 
-    <!-- 4. user_roles -->
-    <changeSet id="2025-12-18-user-roles-seed" author="laplas7">
+    <!-- user_roles -->
+    <changeSet id="MOCK-004-03-user-roles-seed" author="laplas7">
         <!-- admin: ADMIN, HR, USER -->
         <insert tableName="user_roles">
-            <column name="user_id" valueNumeric="1"/>
-            <column name="role_id" valueNumeric="3"/> <!-- ADMIN -->
+            <column name="user_id" valueComputed="(SELECT id FROM users WHERE email='admin@example.com')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM roles WHERE name='ADMIN')"/>
         </insert>
         <insert tableName="user_roles">
-            <column name="user_id" valueNumeric="1"/>
-            <column name="role_id" valueNumeric="2"/> <!-- HR -->
+            <column name="user_id" valueComputed="(SELECT id FROM users WHERE email='admin@example.com')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM roles WHERE name='HR')"/>
         </insert>
         <insert tableName="user_roles">
-            <column name="user_id" valueNumeric="1"/>
-            <column name="role_id" valueNumeric="1"/> <!-- USER -->
+            <column name="user_id" valueComputed="(SELECT id FROM users WHERE email='admin@example.com')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM roles WHERE name='USER')"/>
         </insert>
 
         <!-- hr: HR -->
         <insert tableName="user_roles">
-            <column name="user_id" valueNumeric="2"/>
-            <column name="role_id" valueNumeric="2"/> <!-- HR -->
+            <column name="user_id" valueComputed="(SELECT id FROM users WHERE email='hr@example.com')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM roles WHERE name='HR')"/>
         </insert>
 
         <!-- user: USER -->
         <insert tableName="user_roles">
-            <column name="user_id" valueNumeric="3"/>
-            <column name="role_id" valueNumeric="1"/> <!-- USER -->
+            <column name="user_id" valueComputed="(SELECT id FROM users WHERE email='user@example.com')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM roles WHERE name='USER')"/>
         </insert>
     </changeSet>
 
