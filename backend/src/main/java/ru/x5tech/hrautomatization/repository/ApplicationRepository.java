@@ -24,4 +24,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     boolean existsByUserAndDirection(User user, Direction directionId);
 
     boolean existsByUserIdAndDirectionId(Long userId, Long directionId);
+
+    Optional<Application> findByUserAndDirection(User user, Direction directionId);
 }

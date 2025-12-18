@@ -1,0 +1,101 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+          http://www.liquibase.org/xml/ns/dbchangelog
+          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.21.xsd">
+
+
+    <!-- 2. PersonalData для трёх пользователей -->
+    <changeSet id="2025-12-18-personal-data-seed" author="laplas7">
+        <insert tableName="personal_data">
+            <column name="id" valueNumeric="1"/>
+            <column name="person_guid" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="first_name" value="Admin"/>
+            <column name="last_name" value="User"/>
+            <column name="middle_name" value="Root"/>
+        </insert>
+
+        <insert tableName="personal_data">
+            <column name="id" valueNumeric="2"/>
+            <column name="person_guid" value="00000000-0000-0000-0000-000000000002"/>
+            <column name="first_name" value="Helen"/>
+            <column name="last_name" value="Hr"/>
+            <column name="middle_name" value="Manager"/>
+        </insert>
+
+        <insert tableName="personal_data">
+            <column name="id" valueNumeric="3"/>
+            <column name="person_guid" value="00000000-0000-0000-0000-000000000003"/>
+            <column name="first_name" value="John"/>
+            <column name="last_name" value="Doe"/>
+            <column name="middle_name" value="User"/>
+        </insert>
+    </changeSet>
+
+    <!-- 3. Users (пароли нужно заменить на реальные BCrypt) -->
+    <changeSet id="2025-12-18-users-seed" author="laplas7">
+        <!-- admin -->
+        <insert tableName="users">
+            <column name="id" valueNumeric="1"/>
+            <column name="email" value="admin@example.com"/>
+            <column name="password"
+                    value="$2a$10$0WI3WQUYYME7HzNefRUGFOvTsR1qHeQsh4bqCxdESzijSeGE0gHwS"/> <!-- TODO: подставь свой bcrypt -->
+            <column name="phone" value="+70000000001"/>
+            <column name="enabled" valueBoolean="true"/>
+            <column name="personal_data_id" valueNumeric="1"/>
+        </insert>
+
+        <!-- hr -->
+        <insert tableName="users">
+            <column name="id" valueNumeric="2"/>
+            <column name="email" value="hr@example.com"/>
+            <column name="password"
+                    value="$2a$10$0WI3WQUYYME7HzNefRUGFOvTsR1qHeQsh4bqCxdESzijSeGE0gHwS"/> <!-- тот же или другой bcrypt -->
+            <column name="phone" value="+70000000002"/>
+            <column name="enabled" valueBoolean="true"/>
+            <column name="personal_data_id" valueNumeric="2"/>
+        </insert>
+
+        <!-- обычный пользователь -->
+        <insert tableName="users">
+            <column name="id" valueNumeric="3"/>
+            <column name="email" value="user@example.com"/>
+            <column name="password"
+                    value="$2a$10$0WI3WQUYYME7HzNefRUGFOvTsR1qHeQsh4bqCxdESzijSeGE0gHwS"/>
+            <column name="phone" value="+70000000003"/>
+            <column name="enabled" valueBoolean="true"/>
+            <column name="personal_data_id" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+
+    <!-- 4. user_roles -->
+    <changeSet id="2025-12-18-user-roles-seed" author="laplas7">
+        <!-- admin: ADMIN, HR, USER -->
+        <insert tableName="user_roles">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="role_id" valueNumeric="3"/> <!-- ADMIN -->
+        </insert>
+        <insert tableName="user_roles">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="role_id" valueNumeric="2"/> <!-- HR -->
+        </insert>
+        <insert tableName="user_roles">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="role_id" valueNumeric="1"/> <!-- USER -->
+        </insert>
+
+        <!-- hr: HR -->
+        <insert tableName="user_roles">
+            <column name="user_id" valueNumeric="2"/>
+            <column name="role_id" valueNumeric="2"/> <!-- HR -->
+        </insert>
+
+        <!-- user: USER -->
+        <insert tableName="user_roles">
+            <column name="user_id" valueNumeric="3"/>
+            <column name="role_id" valueNumeric="1"/> <!-- USER -->
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

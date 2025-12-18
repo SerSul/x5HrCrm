@@ -49,4 +49,17 @@ public class DirectionController {
 
         return ResponseEntity.ok("Заявка успешно создана");
     }
+
+    @Operation(summary = "🔒 Отозвать заявку на направление")
+    @DeleteMapping("/apply/{directionId}")
+    public ResponseEntity<String> withdrawApplication(
+            @Parameter(description = "ID направления", required = true)
+            @PathVariable Long directionId,
+
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        applicationService.withdrawApplication(directionId, userDetails);
+
+        return ResponseEntity.ok("Заявка успешно отозвана");
+    }
 }

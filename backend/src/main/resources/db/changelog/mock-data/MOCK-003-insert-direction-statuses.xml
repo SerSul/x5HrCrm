@@ -7,7 +7,6 @@
 
     <changeSet id="013-insert-direction-statuses" author="laplas7">
         <comment>Статусы направлений: intermediate + финальные (mandatory)</comment>
-
         <!-- JUNIOR JAVA -->
 
         <!-- 1. Новый отклик -->
