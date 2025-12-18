@@ -12,9 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import ru.x5tech.hrautomatization.dto.direction.ApplyRequest;
 import ru.x5tech.hrautomatization.service.ApplicationService;
-import ru.x5tech.hrautomatization.service.DirectionService;
-
-import java.util.List;
 
 /**
  * <br>

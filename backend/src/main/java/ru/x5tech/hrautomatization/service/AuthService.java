@@ -89,6 +89,18 @@ public class AuthService {
         return establishSessionAndReturnInfo(authentication, request);
     }
 
+    public boolean hasAnyRole(Authentication auth, String... roles) {
+        if (auth == null) return false;
+
+        var authorities = auth.getAuthorities();
+        for (String r : roles) {
+            String role = r.startsWith("ROLE_") ? r : "ROLE_" + r;
+            boolean ok = authorities.stream().anyMatch(a -> role.equals(a.getAuthority()));
+            if (ok) return true;
+        }
+        return false;
+    }
+
     private UserInfo establishSessionAndReturnInfo(Object principal, HttpServletRequest request) {
         Authentication authentication = createAuthentication(principal);
 

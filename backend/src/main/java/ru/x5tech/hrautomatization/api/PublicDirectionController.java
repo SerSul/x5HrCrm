@@ -3,9 +3,6 @@ package ru.x5tech.hrautomatization.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +40,11 @@ public class PublicDirectionController {
 
     @Operation(summary = "🔓 Детали направления")
     @GetMapping("/{id}")
-    public ResponseEntity<DirectionInfoResponse> getDirectionData(@PathVariable Long id) {
-        return ResponseEntity.ok(directionService.getDirection(id));
+    public ResponseEntity<DirectionInfoResponse> getDirectionData(
+            @PathVariable Long id,
+            @RequestParam(name = "user_id", required = false) Long userId
+    ) {
+        return ResponseEntity.ok(directionService.getDirectionInfoRoleAware(id, userId));
     }
+
 }
