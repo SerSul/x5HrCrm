@@ -8,17 +8,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import ru.x5tech.hrautomatization.dto.direction.ApplyRequest;
 import ru.x5tech.hrautomatization.dto.direction.DirectionInfoResponse;
 import ru.x5tech.hrautomatization.dto.direction.DirectionResponse;
-import ru.x5tech.hrautomatization.service.ApplicationService;
 import ru.x5tech.hrautomatization.service.DirectionService;
 
 import java.util.List;
@@ -45,5 +39,11 @@ public class PublicDirectionController {
             @Parameter(description = "Только направления, куда подался пользователь (нужна авторизация)")
             @RequestParam(name = "only_applied", defaultValue = "false") boolean onlyApplied) {
         return ResponseEntity.ok(directionService.getDirections(onlyApplied));
+    }
+
+    @Operation(summary = "🔓 Детали направления")
+    @GetMapping("/{id}")
+    public ResponseEntity<DirectionInfoResponse> getDirectionData(@PathVariable Long id) {
+        return ResponseEntity.ok(directionService.getDirection(id));
     }
 }
