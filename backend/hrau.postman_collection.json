@@ -4,9 +4,12 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "baseUrl", "value": "http://localhost:8081/api" },
     { "key": "directionId", "value": "1" },
-    { "key": "userId", "value": "3" }
+    { "key": "userId", "value": "3" },
+    { "key": "applicationId", "value": "1" },
+    { "key": "attemptId", "value": "1" },
+    { "key": "token", "value": "" }
   ],
   "item": [
     {
@@ -14,6 +17,22 @@
       "item": [
         {
           "name": "Login (admin@example.com / 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"token\", jsonData.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -23,6 +42,22 @@
         },
         {
           "name": "Login (hr@example.com / 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"token\", jsonData.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -32,6 +67,22 @@
         },
         {
           "name": "Login (user@example.com / 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"token\", jsonData.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -43,6 +94,7 @@
           "name": "Me",
           "request": {
             "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
           }
         },
@@ -50,6 +102,7 @@
           "name": "Logout",
           "request": {
             "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": { "raw": "{{baseUrl}}/auth/logout", "host": ["{{baseUrl}}"], "path": ["auth", "logout"] }
           }
         }
@@ -74,6 +127,7 @@
           "name": "Get directions (only applied)",
           "request": {
             "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
               "raw": "{{baseUrl}}/public/directions?only_applied=true",
               "host": ["{{baseUrl}}"],
@@ -91,10 +145,11 @@
           "name": "Get apply info (current user)",
           "request": {
             "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
-              "raw": "{{baseUrl}}/public/apply-info/directions/{{directionId}}",
+              "raw": "{{baseUrl}}/apply-info/directions/{{directionId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["public", "apply-info", "directions", "{{directionId}}"]
+              "path": ["apply-info", "directions", "{{directionId}}"]
             }
           }
         },
@@ -102,11 +157,141 @@
           "name": "Get apply info by user_id (HR/ADMIN only)",
           "request": {
             "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
-              "raw": "{{baseUrl}}/public/apply-info/directions/{{directionId}}?user_id={{userId}}",
+              "raw": "{{baseUrl}}/apply-info/directions/{{directionId}}?user_id={{userId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["public", "apply-info", "directions", "{{directionId}}"],
+              "path": ["apply-info", "directions", "{{directionId}}"],
               "query": [{ "key": "user_id", "value": "{{userId}}" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "✅ Apply & Test Workflow",
+      "item": [
+        {
+          "name": "1️⃣ Apply to direction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set(\"applicationId\", pm.response.json().id || 1);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/directions/apply/{{directionId}}", "host": ["{{baseUrl}}"], "path": ["directions", "apply", "{{directionId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resumePath\": \"resume.pdf\",\n  \"comment\": \"Хочу на junior backend\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2️⃣ Start test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"attemptId\", jsonData.attemptId);",
+                  "console.log('Test started. Attempt ID:', jsonData.attemptId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/test/start", "host": ["{{baseUrl}}"], "path": ["test", "start"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"applicationId\": {{applicationId}}\n}"
+            }
+          }
+        },
+        {
+          "name": "3️⃣ Submit test ❌ ПРОВАЛ (20/40 < 25 = АВТОКИК)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/test/submit", "host": ["{{baseUrl}}"], "path": ["test", "submit"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"attemptId\": {{attemptId}},\n  \"answers\": [\n    {\"questionId\": 1, \"selectedOptionId\": 1},\n    {\"questionId\": 2, \"selectedOptionId\": 1},\n    {\"questionId\": 3, \"selectedOptionId\": 2},\n    {\"questionId\": 4, \"selectedOptionId\": 1}\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "3️⃣ Submit test ✅ ПРОХОД (40/40 >= 25)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/test/submit", "host": ["{{baseUrl}}"], "path": ["test", "submit"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"attemptId\": {{attemptId}},\n  \"answers\": [\n    {\"questionId\": 1, \"selectedOptionId\": 4},\n    {\"questionId\": 2, \"selectedOptionId\": 3},\n    {\"questionId\": 3, \"selectedOptionId\": 1},\n    {\"questionId\": 4, \"selectedOptionId\": 2}\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "4️⃣ Check apply info after test (закрыта/активна?)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/apply-info/directions/{{directionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["apply-info", "directions", "{{directionId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "HR",
+      "item": [
+        {
+          "name": "Move application status",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/hr/applications/status", "host": ["{{baseUrl}}"], "path": ["hr", "applications", "status"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"applicationId\": {{applicationId}},\n  \"directionStatusSequence\": 2\n}"
             }
           }
         }

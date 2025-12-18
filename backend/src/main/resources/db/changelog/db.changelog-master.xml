@@ -23,5 +23,6 @@
     <include file="/db/changelog/mock-data/MOCK-005-create-sample-test.xml"/>
     <include file="/db/changelog/mock-data/MOCK-006-link-test-to-all-directions.xml"/>
     <include file="/db/changelog/migrations/012-add-status-to-test-attempts.xml"/>
+    <include file="/db/changelog/migrations/013-add-application-fk-to-test-attempts.xml"/>
 
 </databaseChangeLog>

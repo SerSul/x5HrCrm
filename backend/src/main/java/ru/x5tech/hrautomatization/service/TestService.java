@@ -23,6 +23,7 @@ public class TestService {
     private final ApplicationRepository applicationRepository;
     private final TestAttemptRepository testAttemptRepository;
     private final UserContext userContext;
+    private final ApplicationService applicationService;
 
     @Transactional
     public TestStartResponse start(TestStartRequest req) {
@@ -35,6 +36,10 @@ public class TestService {
             throw new ConflictException("Заявка закрыта, тест запускать нельзя");
         }
 
+        if (app.getTestAttempt() != null) {
+            throw new ConflictException("Тест уже запущен для этой заявки");
+        }
+
         if (!app.getUser().getId().equals(currentUserId)) {
             throw new ConflictException("Нельзя запускать тест по чужой заявке");
         }
@@ -45,9 +50,13 @@ public class TestService {
         TestAttempt attempt = TestAttempt.builder()
                 .user(app.getUser())
                 .test(test)
+                .application(app)
                 .status(TestAttemptStatus.IN_PROGRESS)
                 .startedAt(LocalDateTime.now())
                 .build();
+
+        app.setTestAttempt(attempt);
+        applicationRepository.save(app);
 
         attempt = testAttemptRepository.save(attempt);
 
@@ -86,12 +95,14 @@ public class TestService {
         Map<Long, Question> questionMap = test.getQuestions().stream()
                 .collect(Collectors.toMap(Question::getId, q -> q));
 
-        // Сохранение ответов
+        // Сохранение ответов и подсчет баллов
         List<TestAnswer> answers = new ArrayList<>();
+        int totalScore = 0;
+
         for (TestAnswerDto answerDto : req.answers()) {
             Question question = questionMap.get(answerDto.questionId());
             if (question == null) {
-                throw new NotFoundException("Вопрос с ID " + answerDto.questionId() + " не найден в данном тесте");
+                throw new NotFoundException("Вопрос с ID " + answerDto.questionId() + " не найден");
             }
 
             AnswerOption selectedOption = question.getOptions().stream()
@@ -105,28 +116,33 @@ public class TestService {
                     .selectedOption(selectedOption)
                     .build();
             answers.add(testAnswer);
+
+            if (selectedOption.isCorrect()) {
+                totalScore += question.getTestDifficulty();
+            }
         }
 
         attempt.setAnswers(answers);
-
-        // Подсчет баллов
-        int correctAnswers = (int) answers.stream()
-                .filter(ans -> ans.getSelectedOption().isCorrect())
-                .count();
-
-        attempt.setScore(correctAnswers);
+        attempt.setScore(totalScore);
         attempt.setFinishedAt(LocalDateTime.now());
         attempt.setStatus(TestAttemptStatus.FINISHED);
 
         testAttemptRepository.save(attempt);
 
+        if (test.getMinScore() != null && totalScore < test.getMinScore()) {
+            applicationService.failApplication(
+                    attempt.getApplication(),
+                    String.format("Тест провален: %d/%d (минимум %d)",
+                            totalScore, test.getMaxScore(), test.getMinScore())
+            );
+        }
+
         return new TestSubmitResponse(
                 attempt.getId(),
                 attempt.getStatus(),
-                correctAnswers,
-                test.getQuestions().size(),
+                totalScore,
+                test.getMaxScore(),
                 attempt.getFinishedAt()
         );
     }
-
 }

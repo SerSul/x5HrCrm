@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import ru.x5tech.hrautomatization.entity.testing.TestAttempt;
 import ru.x5tech.hrautomatization.entity.user.User;
 
 import java.time.LocalDateTime;
@@ -61,6 +62,9 @@ public class Application {
     @Enumerated(EnumType.STRING)
     @Column(name = "close_reason", length = 50)
     private CloseReason closeReason;
+
+    @OneToOne(mappedBy = "application", cascade = CascadeType.ALL, optional = true)
+    private TestAttempt testAttempt;
 
     // История прохождения статусов
     @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.x5tech.hrautomatization.dto.direction.ApplyRequest;
 import ru.x5tech.hrautomatization.entity.application.Application;
 import ru.x5tech.hrautomatization.entity.application.ApplicationStatusHistory;
+import ru.x5tech.hrautomatization.entity.application.CloseReason;
 import ru.x5tech.hrautomatization.entity.application.Direction;
 import ru.x5tech.hrautomatization.entity.user.User;
 import ru.x5tech.hrautomatization.exception.ConflictException;
@@ -97,4 +98,28 @@ public class ApplicationService {
         application.getStatusHistory().add(history);
         applicationRepository.save(application);
     }
+
+    @Transactional
+    public void failApplication(Application application, String reason) {
+        if (!application.isActive()) {
+            throw new ConflictException("Заявка уже закрыта");
+        }
+
+        application.setActive(false);
+        application.setClosedAt(LocalDateTime.now());
+        application.setCloseReason(CloseReason.REJECTED);
+
+        // Добавляем запись в историю статусов
+        ApplicationStatusHistory history = ApplicationStatusHistory.builder()
+                .application(application)
+                .directionStatus(application.getCurrentDirectionStatus())
+                .changedBy(null)
+                .changedAt(LocalDateTime.now())
+                .comment("Автозакрытие: " + reason)
+                .build();
+
+        application.getStatusHistory().add(history);
+        applicationRepository.save(application);
+    }
+
 }
