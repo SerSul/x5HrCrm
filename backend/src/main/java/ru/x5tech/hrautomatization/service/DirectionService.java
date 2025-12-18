@@ -8,6 +8,7 @@ import ru.x5tech.hrautomatization.entity.application.Application;
 import ru.x5tech.hrautomatization.entity.application.Direction;
 import ru.x5tech.hrautomatization.entity.testing.Test;
 import ru.x5tech.hrautomatization.entity.testing.TestAttemptStatus;
+import ru.x5tech.hrautomatization.exception.NotFoundException;
 import ru.x5tech.hrautomatization.mapper.ApplicationStatusHistoryMapper;
 import ru.x5tech.hrautomatization.mapper.DirectionStatusMapper;
 import ru.x5tech.hrautomatization.repository.ApplicationRepository;
@@ -79,7 +80,7 @@ public class DirectionService {
 
     public DirectionInfoResponse getDirectionInfo(Long directionId, Long userId) {
         Direction direction = directionRepository.findById(directionId)
-                .orElseThrow(() -> new RuntimeException("Direction not found"));
+                .orElseThrow(() -> new NotFoundException("Direction not found"));
 
         List<DirectionStatusResponse> statuses = direction.getDirectionStatuses()
                 .stream()
