@@ -141,6 +141,10 @@
             <column name="recruiter_notes" type="TEXT">
                 <constraints nullable="true"/>
             </column>
+            <column name="resume_path" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+
         </createTable>
 
         <addForeignKeyConstraint
@@ -167,9 +171,9 @@
                 referencedColumnNames="id"/>
 
         <addUniqueConstraint
-                tableName="applications"
-                columnNames="user_id, direction_id"
-                constraintName="uk_applications_user_direction"/>
+                tableName="direction_statuses"
+                columnNames="direction_id, sequence_order"
+                constraintName="uk_direction_sequence_order"/>
 
         <createIndex tableName="applications" indexName="idx_applications_user_id">
             <column name="user_id"/>
@@ -247,16 +251,6 @@
         <createIndex tableName="application_status_history" indexName="idx_app_status_history_changed_at">
             <column name="changed_at"/>
         </createIndex>
-    </changeSet>
-
-    <changeSet id="010-modify-tables" author="laplas7">
-        <addUniqueConstraint
-                tableName="direction_statuses"
-                columnNames="direction_id, sequence_order"
-                constraintName="uk_direction_sequence_order"/>
-        <addColumn tableName="applications">
-            <column name="resume_path" type="VARCHAR"/>
-        </addColumn>
     </changeSet>
 
 </databaseChangeLog>

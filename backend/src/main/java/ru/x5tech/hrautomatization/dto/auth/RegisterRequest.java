@@ -28,5 +28,8 @@ public record RegisterRequest(
 
         @Schema(description = "Отчество", example = "Иванович")
         @JsonProperty("middle_name")
-        String middleName
+        String middleName,
+
+        @Schema(description = "Тег телеграмм", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        String telegram
 ) {}
