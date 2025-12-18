@@ -90,7 +90,7 @@ public class AuthService {
     }
 
     private UserInfo establishSessionAndReturnInfo(Object principal, HttpServletRequest request) {
-        var authentication = createAuthentication(principal);
+        Authentication authentication = createAuthentication(principal);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -100,8 +100,8 @@ public class AuthService {
         );
 
         return new UserInfo(
-                extractUsername(principal),
-                principal instanceof CustomUserDetails cud ? cud.getAuthorities() : null
+                authentication.getName(),
+                authentication.getAuthorities()
         );
     }
 
@@ -113,8 +113,23 @@ public class AuthService {
                     cud.getAuthorities()
             );
         }
-        return (Authentication) principal;
+
+        if (principal instanceof Authentication auth) {
+            return userRepository.findByEmail(auth.getName())
+                    .map(user -> {
+                        CustomUserDetails fullDetails = new CustomUserDetails(user);
+                        return new UsernamePasswordAuthenticationToken(
+                                fullDetails,
+                                auth.getCredentials(),
+                                auth.getAuthorities()
+                        );
+                    })
+                    .orElseThrow(() -> new RuntimeException("User not found after login: " + auth.getName()));
+        }
+
+        throw new IllegalArgumentException("Unsupported principal type: " + principal.getClass());
     }
+
 
     private String extractUsername(Object principal) {
         return principal instanceof CustomUserDetails cud

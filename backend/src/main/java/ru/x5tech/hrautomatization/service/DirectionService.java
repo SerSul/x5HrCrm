@@ -35,7 +35,7 @@ public class DirectionService {
     public List<DirectionResponse> getDirections(boolean onlyApplied) {
         return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .filter(this::isAuthenticated)
-                .map(auth -> extractUserId(auth))
+                .map(this::extractUserId)
                 .map(userId -> onlyApplied
                         ? getAppliedDirections(userId)
                         : getAllDirections(userId))
