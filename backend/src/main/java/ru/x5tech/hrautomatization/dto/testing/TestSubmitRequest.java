@@ -1,14 +1,20 @@
-// TestSubmitRequest.java
 package ru.x5tech.hrautomatization.dto.testing;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
+@Schema(description = "Запрос на сдачу теста")
 public record TestSubmitRequest(
-        @NotNull(message = "ID попытки обязателен")
+        @Schema(description = "ID попытки", example = "1")
+        @JsonProperty("attempt_id")
+        @NotNull
         Long attemptId,
 
-        @NotEmpty(message = "Список ответов не может быть пустым")
+        @Schema(description = "Ответы на вопросы")
+        @JsonProperty("answers")
+        @NotEmpty
         List<TestAnswerDto> answers
 ) {}

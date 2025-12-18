@@ -145,4 +145,43 @@ public class TestService {
                 attempt.getFinishedAt()
         );
     }
+
+    @Transactional(readOnly = true)
+    public TestStartResponse getQuestions(Long attemptId) {
+        Long currentUserId = userContext.requireUserId();
+
+        TestAttempt attempt = testAttemptRepository.findById(attemptId)
+                .orElseThrow(() -> new NotFoundException("Попытка теста не найдена"));
+
+        // ✅ Проверки доступа и статуса
+        if (!attempt.getUser().getId().equals(currentUserId)) {
+            throw new ConflictException("Нельзя смотреть чужой тест");
+        }
+
+        if (attempt.getStatus() == TestAttemptStatus.FINISHED) {
+            throw new ConflictException("Тест уже завершен");
+        }
+
+        if (attempt.getStatus() == TestAttemptStatus.NOT_STARTED) {
+            throw new ConflictException("Тест не запущен");
+        }
+
+        Test test = attempt.getTest();
+
+        List<TestQuestionDto> questions = test.getQuestions().stream()
+                .sorted(Comparator.comparing(q -> q.getOrderIndex() == null ? Integer.MAX_VALUE : q.getOrderIndex()))
+                .map(q -> new TestQuestionDto(
+                        q.getId(),
+                        q.getText(),
+                        q.getTestDifficulty(),
+                        q.getOrderIndex(),
+                        q.getOptions().stream()
+                                .map(o -> new TestQuestionOptionDto(o.getId(), o.getText()))
+                                .toList()
+                ))
+                .toList();
+
+        return new TestStartResponse(attempt.getId(), test.getId(), questions);
+    }
+
 }

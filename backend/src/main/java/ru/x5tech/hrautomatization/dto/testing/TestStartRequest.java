@@ -6,8 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "Запрос на старт теста по заявке")
 public record TestStartRequest(
-
-        @Schema(description = "ID заявки, по которой стартует тест", example = "10", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "ID заявки", example = "10")
         @JsonProperty("application_id")
         @NotNull
         Long applicationId

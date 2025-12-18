@@ -31,4 +31,10 @@ public class TestController {
     public ResponseEntity<TestSubmitResponse> submit(@Valid @RequestBody TestSubmitRequest request) {
         return ResponseEntity.ok(testService.submit(request));
     }
+
+    @Operation(summary = "📋 Получить вопросы по ID попытки (для возобновления теста)")
+    @GetMapping("/questions/{attemptId}")
+    public ResponseEntity<TestStartResponse> getQuestions(@PathVariable Long attemptId) {
+        return ResponseEntity.ok(testService.getQuestions(attemptId));
+    }
 }
