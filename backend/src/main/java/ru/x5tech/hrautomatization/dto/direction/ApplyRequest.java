@@ -8,12 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Author: Дмитрий Николаенков (laplas7)
  * Creation date: 18.12.2025
- *
  * DTO для создания отклика на направление
  */
 @Getter
@@ -24,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ApplyRequest {
 
     @Schema(description = "Ссылка на резюме",
-            example = "resume.pdf",
+            example = "https://...",
             requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Ссылка на резюме обязателен")
     @JsonProperty("resume_path")

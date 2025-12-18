@@ -27,32 +27,57 @@ import java.util.List;
 public class DirectionService {
 
     private final DirectionRepository directionRepository;
-    private final DirectionMapper directionMapper;
     private final DirectionStatusMapper directionStatusMapper;
     private final ApplicationRepository applicationRepository;
     private final ApplicationStatusHistoryMapper applicationStatusHistoryMapper;
 
     public List<DirectionResponse> getDirections(boolean onlyApplied) {
-        // пользователь аутентифицирован?
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean authenticated = auth != null && auth.isAuthenticated()
                 && !(auth instanceof AnonymousAuthenticationToken);
+
+        Long userId = authenticated ? extractUserId(auth) : null;
 
         if (onlyApplied) {
             if (!authenticated) {
                 throw new UnauthorizedException("Authentication required to filter by applications");
             }
 
-            Long userId = extractUserId(auth);
             List<Direction> directions = directionRepository.findAllByApplicantId(userId);
-            return directions.stream().map(directionMapper::toDto).toList();
+            return directions.stream()
+                    .map(direction -> mapToResponse(direction, true))
+                    .toList();
         }
 
         return directionRepository.findAll()
                 .stream()
-                .map(directionMapper::toDto)
+                .map(direction -> mapToResponse(direction, authenticated && isApplied(direction, userId)))
                 .toList();
     }
+
+    private DirectionResponse mapToResponse(Direction direction, boolean applied) {
+        return new DirectionResponse(
+                direction.getId(),
+                direction.getTitle(),
+                direction.getDescription(),
+                direction.getEmploymentType(),
+                direction.getSalaryMin(),
+                direction.getSalaryMax(),
+                direction.isActive(),
+                direction.getCreatedAt(),
+                direction.getClosedAt(),
+                direction.getTest() != null ? direction.getTest().getId() : null,
+                applied
+        );
+    }
+
+    private boolean isApplied(Direction direction, Long userId) {
+        if (userId == null) {
+            return false;
+        }
+        return applicationRepository.existsByUserIdAndDirectionId(userId, direction.getId());
+    }
+
 
     public DirectionInfoResponse getDirection(Long directionId) {
         Direction direction = directionRepository.findById(directionId)

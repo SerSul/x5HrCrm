@@ -36,5 +36,7 @@ public record DirectionResponse(
         LocalDateTime closedAt,
 
         @JsonProperty("test_id")
-        Long testId
+        Long testId,
+
+        boolean applied
 ) {}

@@ -32,13 +32,12 @@ public class DirectionController {
     private final ApplicationService applicationService;
 
     @Operation(summary = "🔒 Подать заявку на направление с резюме")
-    @PostMapping(value = "/apply/{directionId}",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/apply/{directionId}")
     public ResponseEntity<String> applyToDirection(
             @Parameter(description = "ID направления", required = true)
             @PathVariable Long directionId,
 
-            @Valid @ModelAttribute ApplyRequest request,
+            @Valid @RequestBody ApplyRequest request,
 
             @AuthenticationPrincipal UserDetails userDetails) {
 
