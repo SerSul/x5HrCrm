@@ -57,6 +57,9 @@ public class Application {
     @Column(name = "closed_at")
     private LocalDateTime closedAt;
 
+    @Column(name = "resume_path", length = 500)
+    private String resumePath;
+
     // История прохождения статусов
     @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ApplicationStatusHistory> statusHistory = new ArrayList<>();

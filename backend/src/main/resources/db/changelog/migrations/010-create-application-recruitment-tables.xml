@@ -249,4 +249,14 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="010-modify-tables" author="laplas7">
+        <addUniqueConstraint
+                tableName="direction_statuses"
+                columnNames="direction_id, sequence_order"
+                constraintName="uk_direction_sequence_order"/>
+        <addColumn tableName="applications">
+            <column name="resume_path" type="VARCHAR"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

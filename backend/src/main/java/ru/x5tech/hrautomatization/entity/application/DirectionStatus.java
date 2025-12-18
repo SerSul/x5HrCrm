@@ -15,7 +15,7 @@ import lombok.Setter;
  */
 @Entity
 @Table(name = "direction_statuses",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"direction_id", "status_id"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"direction_id", "sequence_order"}))
 @Getter
 @Setter
 @NoArgsConstructor
