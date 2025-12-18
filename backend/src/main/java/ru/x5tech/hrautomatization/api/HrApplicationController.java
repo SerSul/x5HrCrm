@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.x5tech.hrautomatization.dto.hr.ApplicationFilterDto;
+import ru.x5tech.hrautomatization.dto.hr.ApplicationListResponse;
 import ru.x5tech.hrautomatization.dto.hr.MoveApplicationStatusRequest;
 import ru.x5tech.hrautomatization.dto.hr.RejectApplicationRequest;
 import ru.x5tech.hrautomatization.service.HrApplicationService;
@@ -40,5 +42,19 @@ public class HrApplicationController {
         hrApplicationService.rejectApplication(request);
         return ResponseEntity.ok("Кандидат отклонен");
     }
+
+    @Operation(summary = "📋 Список откликов HR с фильтрами")
+    @PostMapping("/list")
+    public ResponseEntity<ApplicationListResponse> getApplicationsList(
+            @Valid @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Фильтры откликов",
+                    required = true
+            )
+            @RequestBody ApplicationFilterDto filter
+    ) {
+        return ResponseEntity.ok(hrApplicationService.getApplications(filter));
+    }
+
+
 
 }
