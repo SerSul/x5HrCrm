@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import ru.x5tech.hrautomatization.entity.application.EmploymentType;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "Направление (вакансия)")
 public record DirectionResponse(
@@ -47,6 +48,10 @@ public record DirectionResponse(
         @Schema(description = "ID теста для направления", example = "1")
         @JsonProperty("test_id")
         Long testId,
+
+        @Schema(description = "Список доступных статусов для направления")
+        @JsonProperty("statuses")
+        List<DirectionStatusResponse> statuses,
 
         @Schema(description = "Подал ли текущий пользователь заявку", example = "true")
         @JsonProperty("applied")

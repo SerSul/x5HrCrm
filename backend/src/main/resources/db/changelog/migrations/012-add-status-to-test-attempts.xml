@@ -15,4 +15,16 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="add-close-reason-to-applications" author="laplas7">
+        <addColumn tableName="applications">
+            <column name="close_reason" type="VARCHAR(50)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <createIndex tableName="applications" indexName="idx_applications_close_reason">
+            <column name="close_reason"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

@@ -58,6 +58,10 @@ public class Application {
     @Column(name = "resume_path", length = 500)
     private String resumePath;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "close_reason", length = 50)
+    private CloseReason closeReason;
+
     // История прохождения статусов
     @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ApplicationStatusHistory> statusHistory = new ArrayList<>();

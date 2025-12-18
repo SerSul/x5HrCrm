@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.x5tech.hrautomatization.dto.direction.DirectionInfoResponse;
+import ru.x5tech.hrautomatization.dto.direction.ApplyInfoResponse;
 import ru.x5tech.hrautomatization.dto.direction.DirectionResponse;
 import ru.x5tech.hrautomatization.service.DirectionService;
 
@@ -36,15 +36,6 @@ public class PublicDirectionController {
             @Parameter(description = "Только направления, куда подался пользователь (нужна авторизация)")
             @RequestParam(name = "only_applied", defaultValue = "false") boolean onlyApplied) {
         return ResponseEntity.ok(directionService.getDirections(onlyApplied));
-    }
-
-    @Operation(summary = "🔓 Детали направления")
-    @GetMapping("/{id}")
-    public ResponseEntity<DirectionInfoResponse> getDirectionData(
-            @PathVariable Long id,
-            @RequestParam(name = "user_id", required = false) Long userId
-    ) {
-        return ResponseEntity.ok(directionService.getDirectionInfoRoleAware(id, userId));
     }
 
 }

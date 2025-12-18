@@ -1,0 +1,116 @@
+{
+  "info": {
+    "name": "HR Automation API (local)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "directionId", "value": "1" },
+    { "key": "userId", "value": "3" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (admin@example.com / 1)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"1\"\n}" }
+          }
+        },
+        {
+          "name": "Login (hr@example.com / 1)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"hr@example.com\",\n  \"password\": \"1\"\n}" }
+          }
+        },
+        {
+          "name": "Login (user@example.com / 1)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"1\"\n}" }
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/auth/logout", "host": ["{{baseUrl}}"], "path": ["auth", "logout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Directions (public)",
+      "item": [
+        {
+          "name": "Get directions (all)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/public/directions?only_applied=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["public", "directions"],
+              "query": [{ "key": "only_applied", "value": "false" }]
+            }
+          }
+        },
+        {
+          "name": "Get directions (only applied)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/public/directions?only_applied=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["public", "directions"],
+              "query": [{ "key": "only_applied", "value": "true" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Apply Info (public)",
+      "item": [
+        {
+          "name": "Get apply info (current user)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/public/apply-info/directions/{{directionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["public", "apply-info", "directions", "{{directionId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get apply info by user_id (HR/ADMIN only)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/public/apply-info/directions/{{directionId}}?user_id={{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["public", "apply-info", "directions", "{{directionId}}"],
+              "query": [{ "key": "user_id", "value": "{{userId}}" }]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

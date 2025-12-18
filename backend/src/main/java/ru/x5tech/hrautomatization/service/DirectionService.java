@@ -28,7 +28,6 @@ public class DirectionService {
     private final ApplicationRepository applicationRepository;
     private final ApplicationStatusHistoryMapper applicationStatusHistoryMapper;
     private final TestAttemptRepository testAttemptRepository;
-
     private final UserContext userContext;
 
     public List<DirectionResponse> getDirections(boolean onlyApplied) {
@@ -55,6 +54,11 @@ public class DirectionService {
     }
 
     private DirectionResponse mapToResponse(Direction direction, boolean applied) {
+        List<DirectionStatusResponse> statuses = direction.getDirectionStatuses()
+                .stream()
+                .map(directionStatusMapper::toDto)
+                .toList();
+
         return new DirectionResponse(
                 direction.getId(),
                 direction.getTitle(),
@@ -66,47 +70,37 @@ public class DirectionService {
                 direction.getCreatedAt(),
                 direction.getClosedAt(),
                 Optional.ofNullable(direction.getTest()).map(Test::getId).orElse(null),
+                statuses,
                 applied
         );
     }
 
-    public DirectionInfoResponse getDirectionInfoRoleAware(Long directionId, Long userId) {
+    public ApplyInfoResponse getApplyInfoRoleAware(Long directionId, Long userId) {
         if (userId != null) {
             userContext.requireAnyRole("HR", "ADMIN");
-            return getDirectionInfo(directionId, userId);
+            return getApplyInfo(directionId, userId);
         }
-        return getDirectionInfo(directionId, null);
+        return getApplyInfo(directionId, null);
     }
 
-    public DirectionInfoResponse getDirectionInfo(Long directionId, Long userId) {
+    public ApplyInfoResponse getApplyInfo(Long directionId, Long userId) {
         Direction direction = directionRepository.findById(directionId)
                 .orElseThrow(() -> new NotFoundException("Direction not found"));
 
-        List<DirectionStatusResponse> statuses = direction.getDirectionStatuses()
-                .stream()
-                .map(directionStatusMapper::toDto)
-                .toList();
-
-        // 1) если userId явно передали — используем его
         if (userId != null) {
             return applicationRepository.findByUserIdAndDirectionId(userId, directionId)
-                    .map(app -> buildDirectionInfoWithApplication(direction, app, statuses, userId))
-                    .orElseGet(() -> new DirectionInfoResponse(directionId, statuses, null, null, null));
+                    .map(app -> buildApplyInfoWithApplication(direction, app, userId))
+                    .orElseGet(() -> new ApplyInfoResponse(directionId, null, null, null, null));
         }
 
-        // 2) иначе пробуем достать из UserContext
         return userContext.currentUserId()
                 .flatMap(uid -> applicationRepository.findByUserIdAndDirectionId(uid, directionId)
-                        .map(app -> buildDirectionInfoWithApplication(direction, app, statuses, uid)))
-                .orElseGet(() -> new DirectionInfoResponse(directionId, statuses, null, null, null));
+                        .map(app -> buildApplyInfoWithApplication(direction, app, uid)))
+                .orElseGet(() -> new ApplyInfoResponse(directionId, null, null, null, null));
     }
 
-    private DirectionInfoResponse buildDirectionInfoWithApplication(
-            Direction direction,
-            Application application,
-            List<DirectionStatusResponse> statuses,
-            Long userId
-    ) {
+
+    private ApplyInfoResponse buildApplyInfoWithApplication(Direction direction, Application application, Long userId) {
         DirectionStatusResponse currentStatus = directionStatusMapper.toDto(application.getCurrentDirectionStatus());
 
         List<ApplicationStatusHistoryResponse> statusHistory = application.getStatusHistory()
@@ -118,7 +112,14 @@ public class DirectionService {
                 .map(test -> getTestInfo(userId, test.getId()))
                 .orElse(null);
 
-        return new DirectionInfoResponse(direction.getId(), statuses, currentStatus, statusHistory, testInfo);
+        return new ApplyInfoResponse(
+                direction.getId(),
+                currentStatus,
+                statusHistory,
+                testInfo,
+                application.getCloseReason()
+        );
+
     }
 
     private CommonTestDto getTestInfo(Long userId, Long testId) {
