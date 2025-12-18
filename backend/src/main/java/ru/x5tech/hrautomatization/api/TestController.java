@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.x5tech.hrautomatization.dto.testing.TestStartRequest;
 import ru.x5tech.hrautomatization.dto.testing.TestStartResponse;
+import ru.x5tech.hrautomatization.dto.testing.TestSubmitRequest;
+import ru.x5tech.hrautomatization.dto.testing.TestSubmitResponse;
 import ru.x5tech.hrautomatization.service.TestService;
 
 @RestController
@@ -22,5 +24,11 @@ public class TestController {
     @PostMapping("/start")
     public ResponseEntity<TestStartResponse> start(@Valid @RequestBody TestStartRequest request) {
         return ResponseEntity.ok(testService.start(request));
+    }
+
+    @Operation(summary = "Отправка ответов на тест")
+    @PostMapping("/submit")
+    public ResponseEntity<TestSubmitResponse> submit(@Valid @RequestBody TestSubmitRequest request) {
+        return ResponseEntity.ok(testService.submit(request));
     }
 }
