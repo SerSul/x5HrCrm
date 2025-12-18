@@ -55,6 +55,9 @@ public class TestService {
                 .startedAt(LocalDateTime.now())
                 .build();
 
+        app.setTestAttempt(attempt);
+        attempt.setApplication(app);
+
         attempt = testAttemptRepository.save(attempt);
 
         List<TestQuestionDto> questions = test.getQuestions().stream()
@@ -72,6 +75,7 @@ public class TestService {
 
         return new TestStartResponse(attempt.getId(), test.getId(), questions);
     }
+
 
 
     @Transactional
