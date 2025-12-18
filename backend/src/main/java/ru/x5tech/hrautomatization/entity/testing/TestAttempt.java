@@ -1,10 +1,7 @@
 package ru.x5tech.hrautomatization.entity.testing;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 import ru.x5tech.hrautomatization.entity.user.User;
 
 import java.time.LocalDateTime;
@@ -17,6 +14,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class TestAttempt {
 
     @Id

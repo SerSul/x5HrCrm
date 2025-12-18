@@ -1,10 +1,18 @@
 package ru.x5tech.hrautomatization.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import ru.x5tech.hrautomatization.dto.direction.ApplyRequest;
+import ru.x5tech.hrautomatization.service.ApplicationService;
+import ru.x5tech.hrautomatization.service.DirectionService;
 
 import java.util.List;
 
@@ -21,9 +29,25 @@ import java.util.List;
 @Tag(name = "Protected Directions", description = "🔒 Защищённые ручки (требуется авторизация)")
 public class DirectionController {
 
-    @Operation(summary = "🔒 Подать заявку на направление, пока только ручка без логики")
-    @PostMapping("/apply/{directionId}")
-    public ResponseEntity<String> applyToDirection(@PathVariable Long directionId) {
-        return ResponseEntity.ok("Заявка создана");
+    private final ApplicationService applicationService;
+
+    @Operation(summary = "🔒 Подать заявку на направление с резюме")
+    @PostMapping(value = "/apply/{directionId}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> applyToDirection(
+            @Parameter(description = "ID направления", required = true)
+            @PathVariable Long directionId,
+
+            @Valid @ModelAttribute ApplyRequest request,
+
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        applicationService.createApplication(
+                directionId,
+                userDetails,
+                request
+        );
+
+        return ResponseEntity.ok("Заявка успешно создана");
     }
 }

@@ -49,23 +49,25 @@ public class AuthService {
             throw new UserAlreadyExistsException("User with email " + registerRequest.email() + " already exists");
         }
 
-        PersonalData personalData = new PersonalData();
-        personalData.setPersonGuid(UUID.randomUUID());
-        personalData.setFirstName(registerRequest.firstName());
-        personalData.setLastName(registerRequest.lastName());
-        personalData.setMiddleName(registerRequest.middleName());
+        PersonalData personalData = PersonalData.builder()
+                .personGuid(UUID.randomUUID())
+                .firstName(registerRequest.firstName())
+                .lastName(registerRequest.lastName())
+                .middleName(registerRequest.middleName())
+                .build();
         personalDataRepository.save(personalData);
 
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new RuntimeException("Default role USER not found"));
 
-        User user = new User();
-        user.setEmail(registerRequest.email());
-        user.setPassword(passwordEncoder.encode(registerRequest.password()));
-        user.setPhone(registerRequest.phone());
-        user.setEnabled(true);
-        user.setPersonalData(personalData);
-        user.setRoles(Set.of(userRole));
+        User user = User.builder()
+                .email(registerRequest.email())
+                .password(passwordEncoder.encode(registerRequest.password()))
+                .phone(registerRequest.phone())
+                .enabled(true)
+                .personalData(personalData)
+                .roles(Set.of(userRole))
+                .build();
         userRepository.save(user);
 
         CustomUserDetails principal = new CustomUserDetails(user);

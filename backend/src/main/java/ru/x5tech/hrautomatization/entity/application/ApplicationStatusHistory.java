@@ -1,10 +1,7 @@
 package ru.x5tech.hrautomatization.entity.application;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import ru.x5tech.hrautomatization.entity.user.User;
 
@@ -21,6 +18,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ApplicationStatusHistory {
 
     @Id

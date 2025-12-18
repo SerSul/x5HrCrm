@@ -4,6 +4,8 @@ package ru.x5tech.hrautomatization.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.x5tech.hrautomatization.entity.application.Application;
+import ru.x5tech.hrautomatization.entity.application.Direction;
+import ru.x5tech.hrautomatization.entity.user.User;
 
 import java.util.Optional;
 
@@ -18,4 +20,6 @@ import java.util.Optional;
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
 
     Optional<Application> findByUserIdAndDirectionId(Long userId, Long directionId);
+
+    boolean existsByUserAndDirection(User user, Direction directionId);
 }

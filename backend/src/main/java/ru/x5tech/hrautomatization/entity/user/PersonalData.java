@@ -2,8 +2,7 @@ package ru.x5tech.hrautomatization.entity.user;
 
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -19,6 +18,9 @@ import java.util.UUID;
 @Table(name = "personal_data")
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PersonalData {
 
     @Id
