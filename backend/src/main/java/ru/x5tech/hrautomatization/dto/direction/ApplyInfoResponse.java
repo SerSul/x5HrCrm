@@ -26,7 +26,19 @@ public record ApplyInfoResponse(
         @JsonProperty("test")
         CommonTestDto test,
 
-        @Schema(description = "Причина закрытия заявки. null если заявка не закрыта/не задано")
+        @Schema(
+                description = "Причина закрытия заявки. null = заявка активна",
+                allowableValues = {
+                        "HIRED",
+                        "REJECTED",
+                        "CANDIDATE_WITHDREW",
+                        "NO_RESPONSE",
+                        "DUPLICATE",
+                        "POSITION_CLOSED",
+                        "TEST_FAILED"
+                },
+                example = "null"
+        )
         @JsonProperty("close_reason")
         CloseReason closeReason
 ) {}
