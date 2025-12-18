@@ -14,9 +14,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.x5tech.hrautomatization.config.CustomUserDetails;
-import ru.x5tech.hrautomatization.dto.auth.LoginRequest;
-import ru.x5tech.hrautomatization.dto.auth.RegisterRequest;
-import ru.x5tech.hrautomatization.dto.auth.UserInfo;
+import ru.x5tech.hrautomatization.dto.auth.*;
 import ru.x5tech.hrautomatization.entity.user.PersonalData;
 import ru.x5tech.hrautomatization.entity.user.Role;
 import ru.x5tech.hrautomatization.entity.user.User;
@@ -26,6 +24,7 @@ import ru.x5tech.hrautomatization.repository.PersonalDataRepository;
 import ru.x5tech.hrautomatization.repository.RoleRepository;
 import ru.x5tech.hrautomatization.repository.UserRepository;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -46,98 +45,101 @@ public class AuthService {
     @Transactional
     public UserInfo register(RegisterRequest registerRequest, HttpServletRequest request) {
         if (userRepository.existsByEmail(registerRequest.email())) {
-            throw new UserAlreadyExistsException("User with email " + registerRequest.email() + " already exists");
+            throw new UserAlreadyExistsException("User already exists: " + registerRequest.email());
         }
+        return performRegistration(registerRequest, request);
+    }
 
-        PersonalData personalData = PersonalData.builder()
-                .personGuid(UUID.randomUUID())
-                .firstName(registerRequest.firstName())
-                .lastName(registerRequest.lastName())
-                .middleName(registerRequest.middleName())
-                .build();
-        personalDataRepository.save(personalData);
 
-        Role userRole = roleRepository.findByName("USER")
+
+    private UserInfo performRegistration(RegisterRequest registerRequest, HttpServletRequest request) {
+        var personalData = personalDataRepository.save(
+                PersonalData.builder()
+                        .personGuid(UUID.randomUUID())
+                        .firstName(registerRequest.firstName())
+                        .lastName(registerRequest.lastName())
+                        .middleName(registerRequest.middleName())
+                        .build()
+        );
+
+        var userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new RuntimeException("Default role USER not found"));
 
-        User user = User.builder()
+        var user = userRepository.save(User.builder()
                 .email(registerRequest.email())
                 .password(passwordEncoder.encode(registerRequest.password()))
                 .phone(registerRequest.phone())
                 .enabled(true)
                 .personalData(personalData)
                 .roles(Set.of(userRole))
-                .build();
-        userRepository.save(user);
-
-        CustomUserDetails principal = new CustomUserDetails(user);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                principal,
-                null,
-                principal.getAuthorities()
+                .build()
         );
 
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        securityContext.setAuthentication(authentication);
-
-        HttpSession session = request.getSession(true);
-        session.setAttribute(
-                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                securityContext
-        );
-
-        return new UserInfo(
-                principal.getEmail(),
-                principal.getAuthorities()
-        );
+        return establishSessionAndReturnInfo(new CustomUserDetails(user), request);
     }
 
     public UserInfo login(LoginRequest loginRequest, HttpServletRequest request) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.email(),
-                            loginRequest.password()
-                    )
-            );
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.email(),
+                        loginRequest.password()
+                )
+        );
 
-            SecurityContext securityContext = SecurityContextHolder.getContext();
-            securityContext.setAuthentication(authentication);
+        return establishSessionAndReturnInfo(authentication, request);
+    }
 
-            HttpSession session = request.getSession(true);
-            session.setAttribute(
-                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                    securityContext
-            );
+    private UserInfo establishSessionAndReturnInfo(Object principal, HttpServletRequest request) {
+        var authentication = createAuthentication(principal);
 
-            return new UserInfo(
-                    authentication.getName(),
-                    authentication.getAuthorities()
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        request.getSession(true).setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                SecurityContextHolder.getContext()
+        );
+
+        return new UserInfo(
+                extractUsername(principal),
+                principal instanceof CustomUserDetails cud ? cud.getAuthorities() : null
+        );
+    }
+
+    private Authentication createAuthentication(Object principal) {
+        if (principal instanceof CustomUserDetails cud) {
+            return new UsernamePasswordAuthenticationToken(
+                    cud,
+                    null,
+                    cud.getAuthorities()
             );
-        } catch (BadCredentialsException e) {
-            throw new UnauthorizedException("Invalid credentials");
         }
+        return (Authentication) principal;
+    }
+
+    private String extractUsername(Object principal) {
+        return principal instanceof CustomUserDetails cud
+                ? cud.getEmail()
+                : principal instanceof Authentication auth
+                ? auth.getName()
+                : principal.toString();
     }
 
     public void logout(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
+        Optional.ofNullable(request.getSession(false))
+                .ifPresent(HttpSession::invalidate);
+
         SecurityContextHolder.clearContext();
     }
 
     public UserInfo getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .filter(this::isValidAuthentication)
+                .map(auth -> new UserInfo(auth.getName(), auth.getAuthorities()))
+                .orElseThrow(() -> new UnauthorizedException("Not authenticated"));
+    }
 
-        if (authentication == null || !authentication.isAuthenticated()
-                || "anonymousUser".equals(authentication.getPrincipal())) {
-            throw new UnauthorizedException("Not authenticated");
-        }
-
-        return new UserInfo(
-                authentication.getName(),
-                authentication.getAuthorities()
-        );
+    private boolean isValidAuthentication(Authentication auth) {
+        return auth.isAuthenticated()
+                && !"anonymousUser".equals(auth.getPrincipal());
     }
 }

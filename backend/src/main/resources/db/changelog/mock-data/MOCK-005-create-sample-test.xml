@@ -1,0 +1,169 @@
+<!--liquibase formatted file: MOCK-012-create-sample-test.xml-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- 1. Создаем тест "Универсальный тест для разработчиков" -->
+    <changeSet id="MOCK-012-01-create-sample-test" author="laplas7">
+        <insert tableName="tests">
+            <column name="id" valueNumeric="1"/>
+            <column name="title" value="Универсальный тест для разработчиков"/>
+            <column name="description" value="Базовый тест на общие знания для backend разработчиков"/>
+            <column name="time_limit_minutes" valueNumeric="30"/>
+            <column name="max_score" valueNumeric="40"/>
+            <column name="min_score" valueNumeric="25"/>
+            <column name="created_at" valueDate="2025-12-18 18:00:00"/>
+        </insert>
+    </changeSet>
+
+    <!-- 2. Вопрос 1: Основы Java -->
+    <changeSet id="MOCK-012-02-question-1" author="laplas7">
+        <insert tableName="questions">
+            <column name="id" valueNumeric="1"/>
+            <column name="test_id" valueNumeric="1"/>
+            <column name="test_difficulty" valueNumeric="1"/>
+            <column name="text" value="Какой модификатор доступа по умолчанию в Java для класса?"/>
+            <column name="order_index" valueNumeric="1"/>
+        </insert>
+
+        <!-- Варианты ответа для вопроса 1 -->
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="1"/>
+            <column name="question_id" valueNumeric="1"/>
+            <column name="text" value="public"/>
+            <column name="is_correct" valueBoolean="false"/>
+        </insert>
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="2"/>
+            <column name="question_id" valueNumeric="1"/>
+            <column name="text" value="private"/>
+            <column name="is_correct" valueBoolean="false"/>
+        </insert>
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="3"/>
+            <column name="question_id" valueNumeric="1"/>
+            <column name="text" value="protected"/>
+            <column name="is_correct" valueBoolean="false"/>
+        </insert>
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="4"/>
+            <column name="question_id" valueNumeric="1"/>
+            <column name="text" value="package-private (default)"/>
+            <column name="is_correct" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+
+    <!-- 3. Вопрос 2: Spring Boot -->
+    <changeSet id="MOCK-012-03-question-2" author="laplas7">
+        <insert tableName="questions">
+            <column name="id" valueNumeric="2"/>
+            <column name="test_id" valueNumeric="1"/>
+            <column name="test_difficulty" valueNumeric="2"/>
+            <column name="text" value="Какая аннотация используется для создания REST контроллера в Spring Boot?"/>
+            <column name="order_index" valueNumeric="2"/>
+        </insert>
+
+        <!-- Варианты ответа для вопроса 2 -->
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="5"/>
+            <column name="question_id" valueNumeric="2"/>
+            <column name="text" value="@Service"/>
+            <column name="is_correct" valueBoolean="false"/>
+        </insert>
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="6"/>
+            <column name="question_id" valueNumeric="2"/>
+            <column name="text" value="@Repository"/>
+            <column name="is_correct" valueBoolean="false"/>
+        </insert>
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="7"/>
+            <column name="question_id" valueNumeric="2"/>
+            <column name="text" value="@RestController"/>
+            <column name="is_correct" valueBoolean="true"/>
+        </insert>
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="8"/>
+            <column name="question_id" valueNumeric="2"/>
+            <column name="text" value="@Component"/>
+            <column name="is_correct" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+    <!-- 4. Вопрос 3: Базы данных -->
+    <changeSet id="MOCK-012-04-question-3" author="laplas7">
+        <insert tableName="questions">
+            <column name="id" valueNumeric="3"/>
+            <column name="test_id" valueNumeric="1"/>
+            <column name="test_difficulty" valueNumeric="2"/>
+            <column name="text" value="Что такое JOIN в SQL?"/>
+            <column name="order_index" valueNumeric="3"/>
+        </insert>
+
+        <!-- Варианты ответа для вопроса 3 -->
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="9"/>
+            <column name="question_id" valueNumeric="3"/>
+            <column name="text" value="Операция объединения таблиц"/>
+            <column name="is_correct" valueBoolean="true"/>
+        </insert>
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="10"/>
+            <column name="question_id" valueNumeric="3"/>
+            <column name="text" value="Арифметическая операция"/>
+            <column name="is_correct" valueBoolean="false"/>
+        </insert>
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="11"/>
+            <column name="question_id" valueNumeric="3"/>
+            <column name="text" value="Агрегационная функция"/>
+            <column name="is_correct" valueBoolean="false"/>
+        </insert>
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="12"/>
+            <column name="question_id" valueNumeric="3"/>
+            <column name="text" value="Условие WHERE"/>
+            <column name="is_correct" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+    <!-- 5. Вопрос 4: REST API -->
+    <changeSet id="MOCK-012-05-question-4" author="laplas7">
+        <insert tableName="questions">
+            <column name="id" valueNumeric="4"/>
+            <column name="test_id" valueNumeric="1"/>
+            <column name="test_difficulty" valueNumeric="3"/>
+            <column name="text" value="Какой HTTP статус код означает 'Создано успешно'?"/>
+            <column name="order_index" valueNumeric="4"/>
+        </insert>
+
+        <!-- Варианты ответа для вопроса 4 -->
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="13"/>
+            <column name="question_id" valueNumeric="4"/>
+            <column name="text" value="200 OK"/>
+            <column name="is_correct" valueBoolean="false"/>
+        </insert>
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="14"/>
+            <column name="question_id" valueNumeric="4"/>
+            <column name="text" value="201 Created"/>
+            <column name="is_correct" valueBoolean="true"/>
+        </insert>
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="15"/>
+            <column name="question_id" valueNumeric="4"/>
+            <column name="text" value="204 No Content"/>
+            <column name="is_correct" valueBoolean="false"/>
+        </insert>
+        <insert tableName="answer_options">
+            <column name="id" valueNumeric="16"/>
+            <column name="question_id" valueNumeric="4"/>
+            <column name="text" value="400 Bad Request"/>
+            <column name="is_correct" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

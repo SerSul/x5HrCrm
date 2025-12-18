@@ -1,29 +1,26 @@
 package ru.x5tech.hrautomatization.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister.*;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.x5tech.hrautomatization.config.CustomUserDetails;
-import ru.x5tech.hrautomatization.dto.direction.ApplicationStatusHistoryResponse;
-import ru.x5tech.hrautomatization.dto.direction.DirectionInfoResponse;
-import ru.x5tech.hrautomatization.dto.direction.DirectionResponse;
-import ru.x5tech.hrautomatization.dto.direction.DirectionStatusResponse;
+import ru.x5tech.hrautomatization.dto.direction.*;
 import ru.x5tech.hrautomatization.dto.testing.CommonTestDto;
 import ru.x5tech.hrautomatization.entity.application.Application;
 import ru.x5tech.hrautomatization.entity.application.Direction;
 import ru.x5tech.hrautomatization.entity.testing.Test;
+import ru.x5tech.hrautomatization.entity.testing.TestAttemptStatus;
 import ru.x5tech.hrautomatization.exception.UnauthorizedException;
 import ru.x5tech.hrautomatization.mapper.ApplicationStatusHistoryMapper;
-import ru.x5tech.hrautomatization.mapper.DirectionMapper;
 import ru.x5tech.hrautomatization.mapper.DirectionStatusMapper;
 import ru.x5tech.hrautomatization.repository.ApplicationRepository;
 import ru.x5tech.hrautomatization.repository.DirectionRepository;
 import ru.x5tech.hrautomatization.repository.TestAttemptRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,27 +31,31 @@ public class DirectionService {
     private final ApplicationRepository applicationRepository;
     private final ApplicationStatusHistoryMapper applicationStatusHistoryMapper;
     private final TestAttemptRepository testAttemptRepository;
+
     public List<DirectionResponse> getDirections(boolean onlyApplied) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        boolean authenticated = auth != null && auth.isAuthenticated()
-                && !(auth instanceof AnonymousAuthenticationToken);
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .filter(this::isAuthenticated)
+                .map(auth -> extractUserId(auth))
+                .map(userId -> onlyApplied
+                        ? getAppliedDirections(userId)
+                        : getAllDirections(userId))
+                .orElseGet(() -> onlyApplied
+                        ? List.of()
+                        : getAllDirections(null));
+    }
 
-        Long userId = authenticated ? extractUserId(auth) : null;
+    private List<DirectionResponse> getAppliedDirections(Long userId) {
+        return directionRepository.findAllByApplicantId(userId)
+                .stream()
+                .map(direction -> mapToResponse(direction, true))
+                .toList();
+    }
 
-        if (onlyApplied) {
-            if (!authenticated) {
-                throw new UnauthorizedException("Authentication required to filter by applications");
-            }
-
-            List<Direction> directions = directionRepository.findAllByApplicantId(userId);
-            return directions.stream()
-                    .map(direction -> mapToResponse(direction, true))
-                    .toList();
-        }
-
+    private List<DirectionResponse> getAllDirections(Long userId) {
         return directionRepository.findAll()
                 .stream()
-                .map(direction -> mapToResponse(direction, authenticated && isApplied(direction, userId)))
+                .map(direction -> mapToResponse(direction,
+                        userId != null && applicationRepository.existsByUserIdAndDirectionId(userId, direction.getId())))
                 .toList();
     }
 
@@ -69,86 +70,69 @@ public class DirectionService {
                 direction.isActive(),
                 direction.getCreatedAt(),
                 direction.getClosedAt(),
-                direction.getTest() != null ? direction.getTest().getId() : null,
+                Optional.ofNullable(direction.getTest())
+                        .map(Test::getId)
+                        .orElse(null),
                 applied
         );
     }
 
-    private boolean isApplied(Direction direction, Long userId) {
-        if (userId == null) {
-            return false;
-        }
-        return applicationRepository.existsByUserIdAndDirectionId(userId, direction.getId());
-    }
-
-
     public DirectionInfoResponse getDirection(Long directionId) {
-        var direction = directionRepository.findById(directionId)
+        Direction direction = directionRepository.findById(directionId)
                 .orElseThrow(() -> new RuntimeException("Direction not found"));
 
-        var statuses = direction.getDirectionStatuses().stream()
+        List<DirectionStatusResponse> statuses = direction.getDirectionStatuses()
+                .stream()
                 .map(directionStatusMapper::toDto)
                 .toList();
 
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        var authenticated = isAuthenticated(auth);
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .filter(this::isAuthenticated)
+                .map(auth -> extractUserId(auth))
+                .flatMap(userId -> applicationRepository.findByUserIdAndDirectionId(userId, directionId))
+                .map(application -> buildDirectionInfoWithApplication(direction, application, statuses))
+                .orElseGet(() -> new DirectionInfoResponse(directionId, statuses, null, null, null));
+    }
 
-        DirectionStatusResponse currentStatus = null;
-        List<ApplicationStatusHistoryResponse> statusHistory = null;
-        CommonTestDto testInfo = null;
+    private DirectionInfoResponse buildDirectionInfoWithApplication(
+            Direction direction,
+            Application application,
+            List<DirectionStatusResponse> statuses) {
 
-        if (authenticated) {
-            Long userId = extractUserId(auth);
-            var application = applicationRepository.findByUserIdAndDirectionId(userId, directionId).orElse(null);
+        DirectionStatusResponse currentStatus = directionStatusMapper.toDto(application.getCurrentDirectionStatus());
+        List<ApplicationStatusHistoryResponse> statusHistory = application.getStatusHistory()
+                .stream()
+                .map(applicationStatusHistoryMapper::toDto)
+                .toList();
 
-            if (application != null) {
-                currentStatus = directionStatusMapper.toDto(application.getCurrentDirectionStatus());
-                statusHistory = application.getStatusHistory().stream()
-                        .map(applicationStatusHistoryMapper::toDto)
-                        .toList();
-            }
+        CommonTestDto testInfo = Optional.ofNullable(direction.getTest())
+                .map(test -> getTestInfo(extractUserId(SecurityContextHolder.getContext().getAuthentication()), test.getId()))
+                .orElse(null);
 
-            var test = direction.getTest();
-            if (test != null) {
-                testInfo = getTestInfo(userId, test.getId());
-            }
-        }
-
-        return new DirectionInfoResponse(
-                directionId,
-                statuses,
-                currentStatus,
-                statusHistory,
-                testInfo
-        );
+        return new DirectionInfoResponse(direction.getId(), statuses, currentStatus, statusHistory, testInfo);
     }
 
     private CommonTestDto getTestInfo(Long userId, Long testId) {
-        // Получаем последнюю попытку прохождения теста
         return testAttemptRepository.findLatestByUserIdAndTestId(userId, testId)
                 .map(attempt -> new CommonTestDto(
                         testId,
                         attempt.getId(),
-                        attempt.getStartedAt() != null,
-                        attempt.getFinishedAt() != null,
+                        attempt.getStatus(),
                         attempt.getScore()
                 ))
-                .orElse(new CommonTestDto(testId, null, false, false, null));
+                .orElse(new CommonTestDto(testId, null, TestAttemptStatus.NOT_STARTED, null));
     }
-
 
     private boolean isAuthenticated(Authentication auth) {
-        return auth != null
-                && auth.isAuthenticated()
-                && !(auth instanceof AnonymousAuthenticationToken);
+        return auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken);
     }
 
-
     private Long extractUserId(Authentication auth) {
-        Object principal = auth.getPrincipal();
-        if (principal instanceof CustomUserDetails cud) {
-            return cud.getId();
-        }
-        throw new IllegalStateException("Unexpected principal type: " + principal.getClass());
+        return Optional.ofNullable(auth.getPrincipal())
+                .filter(principal -> principal instanceof CustomUserDetails)
+                .map(principal -> (CustomUserDetails) principal)
+                .map(CustomUserDetails::getId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Unexpected principal type: " + Optional.ofNullable(auth.getPrincipal()).map(Object::getClass).orElse(null)));
     }
 }

@@ -32,6 +32,9 @@ public class Test {
     @CreatedDate
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "time_limit_minutes", nullable = false)
+    private Integer timeLimitMinutes = 60; // по умолчанию 60 минут
+
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 

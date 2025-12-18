@@ -20,5 +20,8 @@
     <include file="/db/changelog/mock-data/MOCK-003-insert-direction-statuses.xml"/>
     <include file="/db/changelog/migrations/011-add-test-id-to-directions.xml"/>
     <include file="/db/changelog/mock-data/MOCK-004-add-initial-users.xml"/>
+    <include file="/db/changelog/mock-data/MOCK-005-create-sample-test.xml"/>
+    <include file="/db/changelog/mock-data/MOCK-006-link-test-to-all-directions.xml"/>
+    <include file="/db/changelog/migrations/012-add-status-to-test-attempts.xml"/>
 
 </databaseChangeLog>

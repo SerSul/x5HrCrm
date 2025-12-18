@@ -1,0 +1,18 @@
+<!--liquibase formatted file: 012-add-status-to-test-attempts.xml-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="012-add-status-to-test-attempts" author="laplas7">
+        <comment>Добавляем статус попытки теста</comment>
+
+        <addColumn tableName="test_attempts">
+            <column name="status" type="VARCHAR(20)" defaultValue="CREATED">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

@@ -2,6 +2,7 @@ package ru.x5tech.hrautomatization.dto.testing;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import ru.x5tech.hrautomatization.entity.testing.TestAttemptStatus;
 
 @Schema(description = "Информация о попытке прохождения теста пользователем")
 public record CommonTestDto(
@@ -13,15 +14,11 @@ public record CommonTestDto(
         @JsonProperty("attempt_id")
         Long attemptId,
 
-        @Schema(description = "Начат ли тест", example = "true")
-        @JsonProperty("started")
-        boolean started,
+        @Schema(description = "Статус попытки", example = "IN_PROGRESS")
+        @JsonProperty("status")
+        TestAttemptStatus status,
 
-        @Schema(description = "Завершен ли тест", example = "true")
-        @JsonProperty("finished")
-        boolean finished,
-
-        @Schema(description = "Набранные баллы (null если не завершен)", example = "85")
+        @Schema(description = "Набранные баллы", example = "85")
         @JsonProperty("score")
         Integer score
 ) {}

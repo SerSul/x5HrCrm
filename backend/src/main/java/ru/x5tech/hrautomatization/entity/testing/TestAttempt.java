@@ -7,7 +7,6 @@ import ru.x5tech.hrautomatization.entity.user.User;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Entity
 @Table(name = "test_attempts")
 @Getter
@@ -21,12 +20,10 @@ public class TestAttempt {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Кто проходит тест
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private User user;
 
-    // Какой тест
     @ManyToOne(optional = false)
     @JoinColumn(name = "test_id")
     private Test test;
@@ -39,6 +36,10 @@ public class TestAttempt {
 
     @Column(name = "score")
     private Integer score;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private TestAttemptStatus status = TestAttemptStatus.NOT_STARTED;
 
     @OneToMany(mappedBy = "attempt", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TestAnswer> answers;

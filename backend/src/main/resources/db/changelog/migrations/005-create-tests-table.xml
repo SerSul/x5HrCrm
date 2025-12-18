@@ -18,6 +18,7 @@
             <column name="deleted_at" type="TIMESTAMP"/>
             <column name="max_score" type="INTEGER"/>
             <column name="min_score" type="INTEGER"/>
+            <column name="time_limit_minutes" type="INTEGER"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>
