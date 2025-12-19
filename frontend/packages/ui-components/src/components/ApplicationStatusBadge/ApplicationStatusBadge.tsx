@@ -8,7 +8,7 @@ interface ApplicationStatusBadgeProps {
 const ApplicationStatusBadge = ({ status, closeReason }: ApplicationStatusBadgeProps) => {
   // Determine theme based on status title keywords
   const getTheme = (statusTitle: string): 'warning' | 'info' | 'success' | 'danger' | 'utility' => {
-    const lower = statusTitle.toLowerCase();
+    const lower = statusTitle?.toLowerCase();
 
     // Success states
     if (lower.includes('нанят') || lower.includes('hired') || lower.includes('оффер') || lower.includes('offer')) {

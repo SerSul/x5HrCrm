@@ -4,7 +4,7 @@
 }
 
 .pageTitle {
-  margin-bottom: 1rem;
+  margin: 1rem;
 }
 
 .detailPage {
@@ -64,6 +64,16 @@
 }
 
 .description {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.testRequired {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   margin-top: 1.5rem;
 }
 

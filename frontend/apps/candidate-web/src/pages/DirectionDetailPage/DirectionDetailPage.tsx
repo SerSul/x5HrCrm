@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { Spin, Card, Button, Text, TextInput, TextArea } from '@gravity-ui/uikit';
+import {
+  Spin,
+  Card,
+  Button,
+  Text,
+  TextInput,
+  TextArea,
+} from '@gravity-ui/uikit';
 import { useDirectionStore } from '../../storage/directionStorage';
 import { useApplicationStore } from '../../storage/applicationStorage';
 import ApplicationTimeline from '@shared/ui/components/ApplicationTimeline/ApplicationTimeline';
@@ -16,9 +23,12 @@ const DirectionDetailPage = () => {
   const [isApplying, setIsApplying] = useState(false);
 
   const { directions, fetchDirections } = useDirectionStore();
-  const { applyToDirection, fetchApplyInfo, getApplyInfo, loading, error } = useApplicationStore();
+  const { applyToDirection, fetchApplyInfo, getApplyInfo, loading, error } =
+    useApplicationStore();
 
-  const direction = directionId ? directions.find((d) => d.id === directionId) : undefined;
+  const direction = directionId
+    ? directions.find((d) => d.id === directionId)
+    : undefined;
   const applyInfo = directionId ? getApplyInfo(directionId) : undefined;
 
   useEffect(() => {
@@ -85,10 +95,12 @@ const DirectionDetailPage = () => {
     FREELANCE: 'Фриланс',
   };
 
-  const employmentTypeDisplay = employmentTypeMap[direction.employment_type] || direction.employment_type;
-  const salaryDisplay = direction.salary_min && direction.salary_max
-    ? `${direction.salary_min.toLocaleString()} - ${direction.salary_max.toLocaleString()} ₽`
-    : 'Не указана';
+  const employmentTypeDisplay =
+    employmentTypeMap[direction.employment_type] || direction.employment_type;
+  const salaryDisplay =
+    direction.salary_min && direction.salary_max
+      ? `${direction.salary_min.toLocaleString()} - ${direction.salary_max.toLocaleString()} ₽`
+      : 'Не указана';
 
   // Determine if test can be started
   const canStartTest = direction.test_id && hasApplied && applyInfo?.test;
@@ -97,23 +109,37 @@ const DirectionDetailPage = () => {
 
   return (
     <div className={styles.page}>
-      <Text variant="display-2" className={styles.pageTitle}>{direction.title}</Text>
+      <div className={styles.pageTitle}>
+        <Text variant="display-2">{direction.title}</Text>
+      </div>
 
-      <div className={hasApplied ? styles.detailPageWithTimeline : styles.detailPage}>
+      <div
+        className={
+          hasApplied ? styles.detailPageWithTimeline : styles.detailPage
+        }
+      >
         <div className={styles.mainContent}>
           <Card className={styles.card}>
             <div className={styles.details}>
               <div className={styles.detailItem}>
-                <Text variant="subheader-1" color="secondary">Тип занятости</Text>
+                <Text variant="subheader-1" color="secondary">
+                  Тип занятости
+                </Text>
                 <Text variant="body-2">{employmentTypeDisplay}</Text>
               </div>
               <div className={styles.detailItem}>
-                <Text variant="subheader-1" color="secondary">Зарплата</Text>
+                <Text variant="subheader-1" color="secondary">
+                  Зарплата
+                </Text>
                 <Text variant="body-2">{salaryDisplay}</Text>
               </div>
               <div className={styles.detailItem}>
-                <Text variant="subheader-1" color="secondary">Статус</Text>
-                <Text variant="body-2">{direction.active ? 'Активна' : 'Закрыта'}</Text>
+                <Text variant="subheader-1" color="secondary">
+                  Статус
+                </Text>
+                <Text variant="body-2">
+                  {direction.active ? 'Активна' : 'Закрыта'}
+                </Text>
               </div>
             </div>
 
@@ -135,20 +161,30 @@ const DirectionDetailPage = () => {
                     Продолжить тест
                   </Button>
                 ) : testStatus === 'NOT_STARTED' ? (
-                  <div>
+                  <div className={styles.testRequired}>
                     <Text variant="body-1" className={styles.testDescription}>
                       Пройдите тест для этого направления
                     </Text>
-                    <Button size="l" view="action" onClick={() => {
-                      // Start test by calling test/start API
-                      import('../../api/testApi').then(({ startTestRequest }) => {
-                        startTestRequest({ application_id: directionId })
-                          .then(response => {
-                            navigate(`/candidate/test/${response.data.attempt_id}`);
-                          })
-                          .catch(err => console.error('Failed to start test:', err));
-                      });
-                    }}>
+                    <Button
+                      size="l"
+                      view="action"
+                      onClick={() => {
+                        // Start test by calling test/start API
+                        import('../../api/testApi').then(
+                          ({ startTestRequest }) => {
+                            startTestRequest({ application_id: directionId })
+                              .then((response) => {
+                                navigate(
+                                  `/candidate/test/${response.data.attempt_id}`
+                                );
+                              })
+                              .catch((err) =>
+                                console.error('Failed to start test:', err)
+                              );
+                          }
+                        );
+                      }}
+                    >
                       Начать тест
                     </Button>
                   </div>
@@ -190,7 +226,9 @@ const DirectionDetailPage = () => {
                     className={styles.input}
                   />
                   {error && (
-                    <Text variant="body-1" color="danger">{error}</Text>
+                    <Text variant="body-1" color="danger">
+                      {error}
+                    </Text>
                   )}
                   <Button
                     size="l"

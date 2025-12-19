@@ -40,7 +40,7 @@ const VacancyList = ({
   onVacancyClick,
   title,
   emptyStateMessage,
-  buttonText = 'Подробнее и откликнуться',
+  buttonText = 'Подробнее',
   className = '',
 }: VacancyListProps) => {
 
