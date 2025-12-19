@@ -41,6 +41,8 @@ services:
       traefik:
         condition: service_started
     restart: unless-stopped
+    env_file:
+      - .env
 
   recruiter-web:
     build:
@@ -60,7 +62,8 @@ services:
       traefik:
         condition: service_started
     restart: unless-stopped
-
+    env_file:
+      - .env
 networks:
   proxy:
     driver: bridge
