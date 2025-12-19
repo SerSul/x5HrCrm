@@ -1,111 +1,97 @@
 import { create } from 'zustand';
 import {
-  applyToVacancyRequest,
-  fetchMyApplicationsRequest,
-  fetchVacancyApplicationsRequest,
-  updateApplicationStatusRequest,
-  updateApplicationStageRequest,
-  type Application,
-  type ApplicationStage,
-} from '../api/applicationApi';
+  applyToDirectionRequest,
+  withdrawApplicationRequest,
+  fetchApplyInfoRequest,
+} from '../api/directionApi';
+import type { ApplyRequest, ApplyInfoResponse } from '../api/types/openapi';
 
 interface ApplicationState {
-  applications: Application[];
+  // Map directionId -> ApplyInfoResponse
+  applyInfoByDirection: Record<number, ApplyInfoResponse>;
   loading: boolean;
   error: string | null;
-  applyToVacancy: (vacancyId: string) => Promise<void>;
-  fetchMyApplications: () => Promise<void>;
-  fetchVacancyApplications: (vacancyId: string) => Promise<void>;
-  updateApplicationStatus: (id: string, status: string) => Promise<void>;
-  updateApplicationStage: (id: string, stage: ApplicationStage, note?: string) => Promise<void>;
-  getApplicationByVacancyId: (vacancyId: string) => Application | undefined;
+
+  applyToDirection: (directionId: number, data: ApplyRequest) => Promise<void>;
+  withdrawApplication: (directionId: number) => Promise<void>;
+  fetchApplyInfo: (directionId: number) => Promise<void>;
+  getApplyInfo: (directionId: number) => ApplyInfoResponse | undefined;
 }
 
-export const useApplicationStore = create<ApplicationState>()((set) => ({
-  applications: [],
+export const useApplicationStore = create<ApplicationState>()((set, get) => ({
+  applyInfoByDirection: {},
   loading: false,
   error: null,
 
-  applyToVacancy: async (vacancyId: string) => {
+  applyToDirection: async (directionId: number, data: ApplyRequest) => {
     set({ loading: true, error: null });
     try {
-      const res = await applyToVacancyRequest(vacancyId);
+      await applyToDirectionRequest(directionId, data);
+      // Refresh apply info after applying
+      const res = await fetchApplyInfoRequest(directionId);
       set((state) => ({
-        applications: [...state.applications, res.data],
+        applyInfoByDirection: {
+          ...state.applyInfoByDirection,
+          [directionId]: res.data,
+        },
         loading: false,
       }));
     } catch (error: any) {
       set({
-        error: error?.response?.data?.message || 'Failed to apply to vacancy',
+        error:
+          error?.response?.data?.message ||
+          error?.message ||
+          'Failed to apply',
         loading: false,
       });
+      throw error;
     }
   },
 
-  fetchMyApplications: async () => {
+  withdrawApplication: async (directionId: number) => {
     set({ loading: true, error: null });
     try {
-      const res = await fetchMyApplicationsRequest();
-      set({ applications: res.data, loading: false });
+      await withdrawApplicationRequest(directionId);
+      set((state) => {
+        const updated = { ...state.applyInfoByDirection };
+        delete updated[directionId];
+        return { applyInfoByDirection: updated, loading: false };
+      });
     } catch (error: any) {
       set({
-        error: error?.response?.data?.message || 'Failed to fetch applications',
+        error:
+          error?.response?.data?.message ||
+          error?.message ||
+          'Failed to withdraw',
         loading: false,
       });
+      throw error;
     }
   },
 
-  fetchVacancyApplications: async (vacancyId: string) => {
+  fetchApplyInfo: async (directionId: number) => {
     set({ loading: true, error: null });
     try {
-      const res = await fetchVacancyApplicationsRequest(vacancyId);
-      set({ applications: res.data, loading: false });
-    } catch (error: any) {
-      set({
-        error: error?.response?.data?.message || 'Failed to fetch vacancy applications',
-        loading: false,
-      });
-    }
-  },
-
-  updateApplicationStatus: async (id: string, status: string) => {
-    set({ loading: true, error: null });
-    try {
-      const res = await updateApplicationStatusRequest(id, status);
+      const res = await fetchApplyInfoRequest(directionId);
       set((state) => ({
-        applications: state.applications.map((app) =>
-          app.id === id ? res.data : app
-        ),
+        applyInfoByDirection: {
+          ...state.applyInfoByDirection,
+          [directionId]: res.data,
+        },
         loading: false,
       }));
     } catch (error: any) {
       set({
-        error: error?.response?.data?.message || 'Failed to update application status',
+        error:
+          error?.response?.data?.message ||
+          error?.message ||
+          'Failed to fetch apply info',
         loading: false,
       });
     }
   },
 
-  updateApplicationStage: async (id: string, stage: ApplicationStage, note?: string) => {
-    set({ loading: true, error: null });
-    try {
-      const res = await updateApplicationStageRequest(id, stage, note);
-      set((state) => ({
-        applications: state.applications.map((app) =>
-          app.id === id ? res.data : app
-        ),
-        loading: false,
-      }));
-    } catch (error: any) {
-      set({
-        error: error?.response?.data?.message || 'Failed to update application stage',
-        loading: false,
-      });
-    }
-  },
-
-  getApplicationByVacancyId: (vacancyId: string): Application | undefined => {
-    const state: ApplicationState = useApplicationStore.getState();
-    return state.applications.find((app: Application) => app.vacancyId === vacancyId);
+  getApplyInfo: (directionId: number) => {
+    return get().applyInfoByDirection[directionId];
   },
 }));

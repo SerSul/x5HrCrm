@@ -1,0 +1,27 @@
+.container {
+  padding: 2rem;
+}
+
+.title {
+  margin-bottom: 1.5rem;
+}
+
+.applicationsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem;
+}
+
+.emptyText {
+  text-align: center;
+  padding: 2rem;
+  color: var(--g-color-text-secondary);
+}

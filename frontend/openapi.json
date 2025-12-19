@@ -1,0 +1,1048 @@
+{
+  "openapi": "3.0.1",
+  "info": { "title": "OpenAPI definition", "version": "v0" },
+  "servers": [
+    {
+      "url": "http://localhost:8081/api",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "API для аутентификации и управления пользователями"
+    },
+    {
+      "name": "Public Directions",
+      "description": "🔓 Публичные ручки (без авторизации)"
+    },
+    {
+      "name": "Public Apply Info",
+      "description": "🔓 Информация по отклику (apply) на направление"
+    },
+    {
+      "name": "Protected Directions",
+      "description": "🔒 Защищённые ручки (требуется авторизация)"
+    },
+    { "name": "Test", "description": "Прохождение теста кандидатом" },
+    {
+      "name": "HR Applications",
+      "description": "🧑‍💼 Управление статусами заявок"
+    }
+  ],
+  "paths": {
+    "/test/submit": {
+      "post": {
+        "tags": ["Test"],
+        "summary": "Отправка ответов на тест",
+        "operationId": "submit",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TestSubmitRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/TestSubmitResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/test/start": {
+      "post": {
+        "tags": ["Test"],
+        "summary": "Старт теста по заявке (возвращает вопросы)",
+        "operationId": "start",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TestStartRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/TestStartResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hr/applications/status": {
+      "post": {
+        "tags": ["HR Applications"],
+        "summary": "Сменить статус заявки.",
+        "operationId": "moveToStatus",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveApplicationStatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/hr/applications/reject": {
+      "post": {
+        "tags": ["HR Applications"],
+        "summary": "❌ Отказ кандидату (закрыть заявку)",
+        "operationId": "rejectCandidate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectApplicationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Кандидат отклонен",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "404": {
+            "description": "Заявка не найдена",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          },
+          "409": {
+            "description": "Заявка уже закрыта",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          }
+        }
+      }
+    },
+    "/hr/applications/list": {
+      "post": {
+        "tags": ["HR Applications"],
+        "summary": "📋 Список откликов HR с фильтрами",
+        "operationId": "getApplicationsList",
+        "requestBody": {
+          "description": "Фильтры откликов",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ApplicationFilterDto" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/directions/apply/{directionId}": {
+      "post": {
+        "tags": ["Protected Directions"],
+        "summary": "🔒 Подать заявку на направление с резюме",
+        "operationId": "applyToDirection",
+        "parameters": [
+          {
+            "name": "directionId",
+            "in": "path",
+            "description": "ID направления",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ApplyRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Protected Directions"],
+        "summary": "🔒 Отозвать заявку на направление",
+        "operationId": "withdrawApplication",
+        "parameters": [
+          {
+            "name": "directionId",
+            "in": "path",
+            "description": "ID направления",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "*/*": { "schema": { "type": "string" } } }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Регистрация нового пользователя",
+        "description": "Создает нового пользователя в системе с указанными данными. Email должен быть уникальным.",
+        "operationId": "register",
+        "requestBody": {
+          "description": "Данные для регистрации нового пользователя",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RegisterRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Пользователь успешно зарегистрирован",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserInfo" }
+              }
+            }
+          },
+          "409": {
+            "description": "Пользователь с таким email уже существует",
+            "content": { "application/json": {} }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": { "application/json": {} }
+          },
+          "400": {
+            "description": "Некорректные данные запроса",
+            "content": { "application/json": {} }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Выход из системы",
+        "description": "Завершает текущую сессию пользователя и очищает контекст безопасности.",
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "Успешный выход из системы",
+            "content": { "application/json": {} }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": { "application/json": {} }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Вход в систему",
+        "description": "Аутентифицирует пользователя по email и паролю. Создает сессию с бесконечным временем жизни.",
+        "operationId": "login",
+        "requestBody": {
+          "description": "Учетные данные пользователя для входа",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Неверные учетные данные",
+            "content": { "application/json": {} }
+          },
+          "200": {
+            "description": "Успешный вход в систему",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserInfo" }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": { "application/json": {} }
+          },
+          "400": {
+            "description": "Некорректные данные запроса",
+            "content": { "application/json": {} }
+          }
+        }
+      }
+    },
+    "/test/questions/{attemptId}": {
+      "get": {
+        "tags": ["Test"],
+        "summary": "📋 Получить вопросы по ID попытки (для возобновления теста)",
+        "operationId": "getQuestions",
+        "parameters": [
+          {
+            "name": "attemptId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/TestStartResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/directions": {
+      "get": {
+        "tags": ["Public Directions"],
+        "summary": "🔓 Список всех направлений",
+        "operationId": "getDirections",
+        "parameters": [
+          {
+            "name": "only_applied",
+            "in": "query",
+            "description": "Только направления, куда подался пользователь (нужна авторизация)",
+            "required": false,
+            "schema": { "type": "boolean", "default": false }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список направлений",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/DirectionResponse" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Получить информацию о текущем пользователе",
+        "description": "Возвращает информацию об аутентифицированном пользователе из текущей сессии.",
+        "operationId": "getCurrentUser",
+        "responses": {
+          "200": {
+            "description": "Информация о пользователе успешно получена",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserInfo" }
+              }
+            }
+          },
+          "401": {
+            "description": "Пользователь не аутентифицирован",
+            "content": { "application/json": {} }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": { "application/json": {} }
+          }
+        }
+      }
+    },
+    "/apply-info/directions/{directionId}": {
+      "get": {
+        "tags": ["Public Apply Info"],
+        "summary": "🔓 Информация по отклику на направление (текущий статус, история, тест)",
+        "operationId": "getApplyInfo",
+        "parameters": [
+          {
+            "name": "directionId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "description": "Явный userId (только для HR/ADMIN)",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Информация по отклику",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/ApplyInfoResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TestAnswerDto": {
+        "required": ["question_id", "selected_option_id"],
+        "type": "object",
+        "properties": {
+          "question_id": {
+            "type": "integer",
+            "description": "ID вопроса",
+            "format": "int64",
+            "example": 1
+          },
+          "selected_option_id": {
+            "type": "integer",
+            "description": "ID выбранного варианта",
+            "format": "int64",
+            "example": 4
+          }
+        },
+        "description": "Ответ кандидата на вопрос"
+      },
+      "TestSubmitRequest": {
+        "required": ["answers", "attempt_id"],
+        "type": "object",
+        "properties": {
+          "attempt_id": {
+            "type": "integer",
+            "description": "ID попытки",
+            "format": "int64",
+            "example": 1
+          },
+          "answers": {
+            "type": "array",
+            "description": "Ответы на вопросы",
+            "items": { "$ref": "#/components/schemas/TestAnswerDto" }
+          }
+        },
+        "description": "Запрос на сдачу теста"
+      },
+      "TestSubmitResponse": {
+        "type": "object",
+        "properties": {
+          "attempt_id": {
+            "type": "integer",
+            "description": "ID попытки",
+            "format": "int64",
+            "example": 1
+          },
+          "status": {
+            "type": "string",
+            "description": "Статус попытки",
+            "example": "COMPLETED",
+            "enum": [
+              "NOT_STARTED",
+              "STARTED",
+              "IN_PROGRESS",
+              "FINISHED",
+              "EXPIRED",
+              "FAILED"
+            ]
+          },
+          "score": {
+            "type": "integer",
+            "description": "Набранные баллы",
+            "format": "int32",
+            "example": 30
+          },
+          "max_score": {
+            "type": "integer",
+            "description": "Максимум баллов",
+            "format": "int32",
+            "example": 40
+          },
+          "finished_at": {
+            "type": "string",
+            "description": "Время завершения",
+            "format": "date-time"
+          }
+        },
+        "description": "Результат сдачи теста"
+      },
+      "TestStartRequest": {
+        "required": ["application_id"],
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "integer",
+            "description": "ID заявки",
+            "format": "int64",
+            "example": 10
+          }
+        },
+        "description": "Запрос на старт теста по заявке"
+      },
+      "TestQuestionDto": {
+        "type": "object",
+        "properties": {
+          "question_id": {
+            "type": "integer",
+            "description": "ID вопроса",
+            "format": "int64",
+            "example": 1
+          },
+          "text": { "type": "string", "description": "Текст вопроса" },
+          "difficulty": {
+            "type": "integer",
+            "description": "Баллы за правильный ответ",
+            "format": "int32",
+            "example": 10
+          },
+          "order_index": {
+            "type": "integer",
+            "description": "Порядок",
+            "format": "int32",
+            "example": 1
+          },
+          "options": {
+            "type": "array",
+            "description": "Варианты ответа",
+            "items": { "$ref": "#/components/schemas/TestQuestionOptionDto" }
+          }
+        },
+        "description": "Вопрос теста"
+      },
+      "TestQuestionOptionDto": {
+        "type": "object",
+        "properties": {
+          "option_id": {
+            "type": "integer",
+            "description": "ID варианта",
+            "format": "int64",
+            "example": 4
+          },
+          "text": { "type": "string", "description": "Текст варианта" }
+        },
+        "description": "Вариант ответа"
+      },
+      "TestStartResponse": {
+        "type": "object",
+        "properties": {
+          "attempt_id": {
+            "type": "integer",
+            "description": "ID попытки",
+            "format": "int64",
+            "example": 1
+          },
+          "test_id": {
+            "type": "integer",
+            "description": "ID теста",
+            "format": "int64",
+            "example": 1
+          },
+          "questions": {
+            "type": "array",
+            "description": "Вопросы теста",
+            "items": { "$ref": "#/components/schemas/TestQuestionDto" }
+          }
+        },
+        "description": "Ответ при старте теста"
+      },
+      "MoveApplicationStatusRequest": {
+        "required": ["direction_id", "sequence_order", "user_id"],
+        "type": "object",
+        "properties": {
+          "direction_id": {
+            "type": "integer",
+            "description": "ID направления (вакансии), по которому создана заявка",
+            "format": "int64",
+            "example": 1
+          },
+          "user_id": {
+            "type": "integer",
+            "description": "ID пользователя-кандидата, чья заявка переводится в другой статус",
+            "format": "int64",
+            "example": 42
+          },
+          "sequence_order": {
+            "type": "integer",
+            "description": "Порядковый номер статуса (sequence_order) в рамках выбранного направления; вычисляется фронтендом по списку statuses",
+            "format": "int32",
+            "example": 3
+          },
+          "comment": {
+            "type": "string",
+            "description": "Комментарий HR к изменению статуса (попадёт в историю статусов)",
+            "example": "Назначили интервью"
+          }
+        },
+        "description": "Запрос HR на смену статуса заявки"
+      },
+      "CloseReason": {
+        "type": "string",
+        "description": "Причины закрытия заявки",
+        "example": "REJECTED",
+        "enum": [
+          "HIRED",
+          "REJECTED",
+          "CANDIDATE_WITHDREW",
+          "NO_RESPONSE",
+          "DUPLICATE",
+          "POSITION_CLOSED",
+          "TEST_FAILED",
+          "REJECTED",
+          "NO_RESPONSE",
+          "DUPLICATE"
+        ]
+      },
+      "RejectApplicationRequest": {
+        "required": ["application_id"],
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "integer",
+            "description": "ID заявки",
+            "format": "int64",
+            "example": 15
+          },
+          "close_reason": { "$ref": "#/components/schemas/CloseReason" },
+          "comment": {
+            "type": "string",
+            "description": "Комментарий HR (опционально)",
+            "example": "Не подошел по опыту"
+          }
+        },
+        "description": "Запрос на отказ кандидату"
+      },
+      "ApplicationFilterDto": {
+        "type": "object",
+        "properties": {
+          "direction_name": {
+            "type": "string",
+            "description": "Название направления",
+            "example": "Backend"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Только активные отклики",
+            "example": true
+          },
+          "sort_by_score": {
+            "type": "string",
+            "description": "Сортировка по баллам: desc|asc",
+            "example": "desc"
+          },
+          "page": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "Страница",
+            "format": "int32",
+            "example": 1
+          },
+          "size": {
+            "type": "integer",
+            "description": "Размер страницы",
+            "format": "int32",
+            "example": 20
+          }
+        },
+        "description": "Фильтры откликов HR"
+      },
+      "ApplicationHrItem": {
+        "type": "object",
+        "properties": {
+          "user_id": { "type": "integer", "format": "int64" },
+          "application_id": { "type": "integer", "format": "int64" },
+          "full_name": { "type": "string" },
+          "direction_id": { "type": "integer", "format": "int64" },
+          "direction_name": { "type": "string" },
+          "test_attempt_id": { "type": "integer", "format": "int64" },
+          "test_status": {
+            "type": "string",
+            "enum": [
+              "NOT_STARTED",
+              "STARTED",
+              "IN_PROGRESS",
+              "FINISHED",
+              "EXPIRED",
+              "FAILED"
+            ]
+          },
+          "test_score": { "type": "integer", "format": "int32" },
+          "max_score": { "type": "integer", "format": "int32" },
+          "is_active": { "type": "boolean" },
+          "applied_at": { "type": "string", "format": "date-time" },
+          "resume_path": { "type": "string" }
+        },
+        "description": "Отклик для HR списка",
+        "example": []
+      },
+      "ApplicationListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "Список откликов",
+            "example": [],
+            "items": { "$ref": "#/components/schemas/ApplicationHrItem" }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Общее количество откликов",
+            "format": "int64",
+            "example": 127
+          },
+          "page": {
+            "type": "integer",
+            "description": "Номер текущей страницы (0-based)",
+            "format": "int32",
+            "example": 0
+          },
+          "size": {
+            "type": "integer",
+            "description": "Количество элементов на странице",
+            "format": "int32",
+            "example": 20
+          },
+          "total_pages": {
+            "type": "integer",
+            "description": "Общее количество страниц",
+            "format": "int32",
+            "example": 7
+          }
+        },
+        "description": "Список откликов HR с пагинацией"
+      },
+      "ApplyRequest": {
+        "required": ["resume_path"],
+        "type": "object",
+        "properties": {
+          "comment": {
+            "maxLength": 2000,
+            "minLength": 0,
+            "type": "string",
+            "description": "Дополнительный комментарий к заявке",
+            "example": "Я заинтересован в этой позиции..."
+          },
+          "resume_path": {
+            "type": "string",
+            "description": "Ссылка на резюме",
+            "example": "https://..."
+          }
+        },
+        "description": "Запрос на подачу заявки на направление"
+      },
+      "RegisterRequest": {
+        "required": ["email", "first_name", "last_name", "password"],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email пользователя",
+            "example": "newuser@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "Пароль пользователя",
+            "example": "securePassword123"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Номер телефона",
+            "example": "+79991234567"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "Имя",
+            "example": "Иван"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Фамилия",
+            "example": "Иванов"
+          },
+          "middle_name": {
+            "type": "string",
+            "description": "Отчество",
+            "example": "Иванович"
+          },
+          "telegram": { "type": "string", "description": "Тег телеграмм" }
+        },
+        "description": "Запрос на регистрацию нового пользователя"
+      },
+      "UserInfo": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Имя пользователя (email)",
+            "example": "user@example.com"
+          },
+          "authorities": {
+            "type": "object",
+            "description": "Права доступа и роли пользователя",
+            "example": [{ "authority": "ROLE_USER" }]
+          }
+        },
+        "description": "Информация о пользователе"
+      },
+      "LoginRequest": {
+        "required": ["email", "password"],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email пользователя",
+            "example": "user@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "Пароль пользователя",
+            "example": "password123"
+          }
+        },
+        "description": "Запрос на вход в систему"
+      },
+      "DirectionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID направления",
+            "format": "int64",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Название направления",
+            "example": "Backend Java Developer"
+          },
+          "description": {
+            "type": "string",
+            "description": "Описание направления",
+            "example": "Разработка серверной части приложения"
+          },
+          "employment_type": {
+            "type": "string",
+            "description": "Тип занятости",
+            "example": "FULL_TIME",
+            "enum": [
+              "FULL_TIME",
+              "PART_TIME",
+              "CONTRACT",
+              "INTERNSHIP",
+              "REMOTE",
+              "FREELANCE"
+            ]
+          },
+          "salary_min": {
+            "type": "integer",
+            "description": "Минимальная зарплата",
+            "format": "int32",
+            "example": 100000
+          },
+          "salary_max": {
+            "type": "integer",
+            "description": "Максимальная зарплата",
+            "format": "int32",
+            "example": 200000
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Активно ли направление",
+            "example": true
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Дата создания направления",
+            "format": "date-time"
+          },
+          "closed_at": {
+            "type": "string",
+            "description": "Дата закрытия направления",
+            "format": "date-time"
+          },
+          "test_id": {
+            "type": "integer",
+            "description": "ID теста для направления",
+            "format": "int64",
+            "example": 1
+          },
+          "statuses": {
+            "type": "array",
+            "description": "Список доступных статусов для направления",
+            "items": { "$ref": "#/components/schemas/DirectionStatusResponse" }
+          },
+          "applied": {
+            "type": "boolean",
+            "description": "Подал ли текущий пользователь заявку",
+            "example": true
+          }
+        },
+        "description": "Направление (вакансия)"
+      },
+      "DirectionStatusResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID статуса",
+            "format": "int64",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Название статуса",
+            "example": "Новая заявка"
+          },
+          "description": {
+            "type": "string",
+            "description": "Описание статуса",
+            "example": "Заявка получена и ожидает рассмотрения"
+          },
+          "sequence_order": {
+            "type": "integer",
+            "description": "Порядковый номер статуса в цепочке",
+            "format": "int32",
+            "example": 1
+          },
+          "is_mandatory": {
+            "type": "boolean",
+            "description": "Является ли статус обязательным",
+            "example": true
+          }
+        },
+        "description": "Статус направления"
+      },
+      "ApplicationStatusHistoryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID записи истории",
+            "format": "int64",
+            "example": 1
+          },
+          "status_id": {
+            "type": "integer",
+            "description": "ID статуса",
+            "format": "int64",
+            "example": 2
+          },
+          "status_title": {
+            "type": "string",
+            "description": "Название статуса",
+            "example": "Собеседование"
+          },
+          "changed_by_user_id": {
+            "type": "integer",
+            "description": "ID пользователя, изменившего статус",
+            "format": "int64",
+            "example": 5
+          },
+          "changed_at": {
+            "type": "string",
+            "description": "Дата и время изменения статуса",
+            "format": "date-time"
+          },
+          "comment": {
+            "type": "string",
+            "description": "Комментарий к смене статуса",
+            "example": "Кандидат прошел первый этап"
+          }
+        },
+        "description": "Запись из истории изменения статуса отклика"
+      },
+      "ApplyInfoResponse": {
+        "type": "object",
+        "properties": {
+          "direction_id": {
+            "type": "integer",
+            "description": "ID направления",
+            "format": "int64",
+            "example": 1
+          },
+          "current_status": {
+            "$ref": "#/components/schemas/DirectionStatusResponse"
+          },
+          "status_history": {
+            "type": "array",
+            "description": "История изменения статусов заявки (null если не подавал)",
+            "items": {
+              "$ref": "#/components/schemas/ApplicationStatusHistoryResponse"
+            }
+          },
+          "test": { "$ref": "#/components/schemas/CommonTestDto" },
+          "close_reason": { "$ref": "#/components/schemas/CloseReason" }
+        },
+        "description": "Информация об отклике пользователя на направление"
+      },
+      "CommonTestDto": {
+        "type": "object",
+        "properties": {
+          "test_id": {
+            "type": "integer",
+            "description": "ID теста",
+            "format": "int64",
+            "example": 1
+          },
+          "attempt_id": {
+            "type": "integer",
+            "description": "ID попытки прохождения (null если не начинал)",
+            "format": "int64",
+            "example": 5
+          },
+          "status": {
+            "type": "string",
+            "description": "Статус попытки",
+            "example": "IN_PROGRESS",
+            "enum": [
+              "NOT_STARTED",
+              "STARTED",
+              "IN_PROGRESS",
+              "FINISHED",
+              "EXPIRED",
+              "FAILED"
+            ]
+          },
+          "score": {
+            "type": "integer",
+            "description": "Набранные баллы",
+            "format": "int32",
+            "example": 85
+          }
+        },
+        "description": "Информация о попытке прохождения теста пользователем"
+      }
+    }
+  }
+}

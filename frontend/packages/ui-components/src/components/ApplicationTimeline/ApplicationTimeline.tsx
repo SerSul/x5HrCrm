@@ -1,64 +1,70 @@
 import { Text, Icon } from '@gravity-ui/uikit';
-import { Check, Xmark } from '@gravity-ui/icons';
-import type { ApplicationStage, ApplicationStageHistory } from '../../types/application';
+import { Check } from '@gravity-ui/icons';
 import styles from './ApplicationTimeline.module.scss';
 
+// OpenAPI types
+export interface DirectionStatusResponse {
+  id: number;
+  title: string;
+  description: string;
+  sequence_order: number;
+  is_mandatory: boolean;
+}
+
+export interface ApplicationStatusHistoryResponse {
+  id: number;
+  status_id: number;
+  status_title: string;
+  changed_by_user_id: number;
+  changed_at: string;
+  comment?: string;
+}
+
 interface ApplicationTimelineProps {
-  currentStage: ApplicationStage;
-  stageHistory: ApplicationStageHistory[];
+  statuses: DirectionStatusResponse[];
+  currentStatus?: DirectionStatusResponse;
+  statusHistory: ApplicationStatusHistoryResponse[];
   compact?: boolean;
 }
 
-const STAGES: Array<{
-  key: ApplicationStage;
-  label: string;
-  description: string;
-}> = [
-  { key: 'applied', label: 'Подано', description: 'Заявка отправлена' },
-  { key: 'screening', label: 'Скрининг', description: 'Проверка резюме' },
-  { key: 'phone', label: 'Телефонное интервью', description: 'Первичное собеседование' },
-  { key: 'technical', label: 'Техническое интервью', description: 'Техническая оценка' },
-  { key: 'final', label: 'Финальное интервью', description: 'Финальное собеседование' },
-  { key: 'offer', label: 'Оффер', description: 'Предложение получено' },
-  { key: 'hired', label: 'Нанят', description: 'Успешно нанят' },
-];
+const ApplicationTimeline = ({
+  statuses,
+  currentStatus,
+  statusHistory,
+  compact = false
+}: ApplicationTimelineProps) => {
+  // Sort statuses by sequence_order
+  const sortedStatuses = [...statuses].sort((a, b) => a.sequence_order - b.sequence_order);
 
-const ApplicationTimeline = ({ currentStage, stageHistory, compact = false }: ApplicationTimelineProps) => {
-  const currentStageIndex = STAGES.findIndex(s => s.key === currentStage);
-  const isRejected = currentStage === 'rejected';
+  const getStatusState = (status: DirectionStatusResponse): 'completed' | 'current' | 'future' => {
+    if (!currentStatus) return 'future';
 
-  const getStageStatus = (stageKey: ApplicationStage, index: number): 'completed' | 'current' | 'future' | 'rejected' => {
-    if (isRejected && stageKey === 'rejected') return 'rejected';
-    if (isRejected) return 'future';
-    if (index < currentStageIndex) return 'completed';
-    if (index === currentStageIndex) return 'current';
+    const hasReached = statusHistory.some(h => h.status_id === status.id);
+    if (hasReached) return 'completed';
+
+    if (currentStatus.id === status.id) return 'current';
+
     return 'future';
   };
 
-  const getStageDate = (stageKey: ApplicationStage): string | undefined => {
-    const historyItem = stageHistory.find(h => h.stage === stageKey);
+  const getStatusDate = (statusId: number): string | undefined => {
+    const historyItem = statusHistory.find(h => h.status_id === statusId);
     if (!historyItem) return undefined;
 
-    const date = new Date(historyItem.date);
+    const date = new Date(historyItem.changed_at);
     return date.toLocaleDateString('ru-RU', {
       day: 'numeric',
       month: 'long',
-      year: 'numeric'
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
-  const getStageNote = (stageKey: ApplicationStage): string | undefined => {
-    const historyItem = stageHistory.find(h => h.stage === stageKey);
-    return historyItem?.note;
+  const getStatusComment = (statusId: number): string | undefined => {
+    const historyItem = statusHistory.find(h => h.status_id === statusId);
+    return historyItem?.comment;
   };
-
-  const displayStages = isRejected
-    ? STAGES.slice(0, currentStageIndex + 1)
-    : STAGES.filter(s => s.key !== 'rejected');
-
-  if (isRejected) {
-    displayStages.push({ key: 'rejected', label: 'Отклонено', description: 'Заявка отклонена' });
-  }
 
   return (
     <div className={`${styles.timeline} ${compact ? styles.compact : ''}`}>
@@ -66,62 +72,68 @@ const ApplicationTimeline = ({ currentStage, stageHistory, compact = false }: Ap
         Статус заявки
       </Text>
 
-      <div className={styles.stages}>
-        {displayStages.map((stage, index) => {
-          const status = getStageStatus(stage.key, index);
-          const date = getStageDate(stage.key);
-          const note = getStageNote(stage.key);
-          const isLast = index === displayStages.length - 1;
+      {statusHistory.length === 0 ? (
+        <Text variant="body-1" color="secondary">
+          История статусов пуста
+        </Text>
+      ) : (
+        <div className={styles.stages}>
+          {sortedStatuses.map((status, index) => {
+            const state = getStatusState(status);
+            const date = getStatusDate(status.id);
+            const comment = getStatusComment(status.id);
+            const isLast = index === sortedStatuses.length - 1;
 
-          return (
-            <div key={stage.key} className={styles.stage}>
-              <div className={styles.stageIndicator}>
-                <div className={`${styles.indicator} ${styles[status]}`}>
-                  {status === 'completed' && <Icon data={Check} size={16} />}
-                  {status === 'rejected' && <Icon data={Xmark} size={16} />}
-                  {status === 'current' && <div className={styles.currentDot} />}
+            return (
+              <div key={status.id} className={styles.stage}>
+                <div className={styles.stageIndicator}>
+                  <div className={`${styles.indicator} ${styles[state]}`}>
+                    {state === 'completed' && <Icon data={Check} size={16} />}
+                    {state === 'current' && <div className={styles.currentDot} />}
+                  </div>
+                  {!isLast && (
+                    <div className={`${styles.connector} ${state === 'completed' ? styles.solid : styles.dotted}`} />
+                  )}
                 </div>
-                {!isLast && (
-                  <div className={`${styles.connector} ${status === 'completed' ? styles.solid : styles.dotted}`} />
-                )}
+
+                <div className={styles.stageContent}>
+                  <Text
+                    variant={state === 'current' ? 'subheader-2' : 'body-2'}
+                    className={`${styles.stageLabel} ${styles[state]}`}
+                  >
+                    {status.title}
+                    {status.is_mandatory && ' *'}
+                  </Text>
+
+                  {!compact && (
+                    <Text variant="caption-1" color="secondary" className={styles.stageDescription}>
+                      {status.description}
+                    </Text>
+                  )}
+
+                  {date && (
+                    <Text variant="caption-1" color="secondary" className={styles.stageDate}>
+                      {date}
+                    </Text>
+                  )}
+
+                  {comment && !compact && (
+                    <Text variant="caption-2" color="secondary" className={styles.stageNote}>
+                      💬 {comment}
+                    </Text>
+                  )}
+
+                  {state === 'current' && (
+                    <Text variant="caption-1" className={styles.currentIndicator}>
+                      ← Вы здесь
+                    </Text>
+                  )}
+                </div>
               </div>
-
-              <div className={styles.stageContent}>
-                <Text
-                  variant={status === 'current' ? 'subheader-2' : 'body-2'}
-                  className={`${styles.stageLabel} ${styles[status]}`}
-                >
-                  {stage.label}
-                </Text>
-
-                {!compact && (
-                  <Text variant="caption-1" color="secondary" className={styles.stageDescription}>
-                    {stage.description}
-                  </Text>
-                )}
-
-                {date && (
-                  <Text variant="caption-1" color="secondary" className={styles.stageDate}>
-                    {date}
-                  </Text>
-                )}
-
-                {note && !compact && (
-                  <Text variant="caption-2" color="secondary" className={styles.stageNote}>
-                    {note}
-                  </Text>
-                )}
-
-                {status === 'current' && (
-                  <Text variant="caption-1" className={styles.currentIndicator}>
-                    ← Вы здесь
-                  </Text>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

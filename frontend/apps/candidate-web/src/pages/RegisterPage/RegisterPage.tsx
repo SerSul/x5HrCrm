@@ -11,6 +11,7 @@ const RegisterPage = () => {
   const [middleName, setMiddleName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState('');
 
   const { register, loading, error, clearError } = useAuthStore();
@@ -22,6 +23,12 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      alert('Пароли не совпадают');
+      return;
+    }
+
     try {
       await register({
         firstName,
@@ -85,6 +92,16 @@ const RegisterPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
                 placeholder="Пароль"
+                disabled={loading}
+                required
+              />
+            </div>
+            <div className={styles.field}>
+              <TextInput
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                type="password"
+                placeholder="Подтвердите пароль"
                 disabled={loading}
                 required
               />

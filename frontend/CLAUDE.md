@@ -2,6 +2,30 @@
 
 This file provides guidance to Claude Code when working with the X5 Bootcamp frontend monorepo.
 
+## API Structure
+
+The application follows the OpenAPI specification defined in `openapi.json` at the project root.
+
+### Candidate App API (`apps/candidate-web/src/api/`)
+- **types/openapi.ts** - TypeScript interfaces matching OpenAPI spec
+- **directionApi.ts** - Direction endpoints (list, apply, withdraw, fetch apply info)
+- **testApi.ts** - Test flow endpoints (start, fetch questions, submit)
+- **baseApi.ts** - Axios instance configuration
+
+### State Management (`apps/candidate-web/src/storage/`)
+- **directionStorage.ts** - Direction state (list, by ID)
+- **applicationStorage.ts** - Application state (apply info by direction ID)
+- **testStorage.ts** - Test state (current test, results)
+- **authStorage.ts** - Authentication state
+
+### Key Data Models
+- **DirectionResponse** - Direction with `test_id`, `employment_type`, `salary_min/max`, `statuses[]`, `applied` flag
+- **ApplyInfoResponse** - Application info with `current_status`, `status_history[]`, `test`, `close_reason`
+- **DirectionStatusResponse** - Status with `sequence_order`, `is_mandatory` for dynamic progression
+- **TestStartResponse** - Test with `attempt_id`, `test_id`, `questions[]`
+
+All entity IDs are **numbers** (not strings).
+
 ## Monorepo Overview
 
 This is a **Bun workspace monorepo** with separate applications for candidates and recruiters, plus a shared UI components package.
@@ -25,13 +49,30 @@ frontend/
 - **ui-components** (`packages/ui-components/`)
   - Shared UI components used by both apps
   - Import via `@shared/ui/*` alias
-  - Contains: Header, Link, VacancyList, ApplicationStatusBadge, ApplicationTimeline, WithToolbarLayout
+  - Components:
+    - **VacancyList** - Displays Direction cards with employment type, salary range, test badges
+    - **ApplicationTimeline** - Dynamic status progression using `DirectionStatusResponse[]` with sequence_order
+    - **ApplicationStatusBadge** - Smart theme detection based on status keywords (supports Russian/English)
+    - **Header** - App header with navigation
+    - **Link** - Styled link component
+    - **WithToolbarLayout** - Layout with sidebar
 
 ### Applications
 - **candidate-web** (`apps/candidate-web/`)
   - Candidate-facing application
-  - Routes: /candidate, /login, /register
-  - See `apps/candidate-web/CLAUDE.md` for details
+  - Routes:
+    - `/candidate` - Home page with directions list
+    - `/candidate/directions/:id` - Direction detail page with apply form and test section
+    - `/candidate/test/:attemptId` - Test taking page with questions
+    - `/candidate/applications` - User's applications with timelines
+    - `/candidate/profile` - User profile
+    - `/login`, `/register` - Authentication
+  - Pages:
+    - **HomePage** - Lists directions, filter by applied
+    - **DirectionDetailPage** - Direction info, resume URL input, application timeline, test section
+    - **TestPage** - Test questions with RadioGroup, submit answers, results screen
+    - **MyApplicationsPage** - Shows applied directions with status timelines
+    - **ProfilePage** - User profile management
 
 - **recruiter-web** (`apps/recruiter-web/`)
   - Recruiter-facing application
@@ -42,6 +83,13 @@ frontend/
 - **mocks/** (at root)
   - MSW handlers for both applications
   - Shared by both apps via relative import: `../../../mocks/worker.ts`
+  - Implemented endpoints:
+    - **Auth**: POST /auth/register, POST /auth/login, GET /auth/me, POST /auth/logout
+    - **Directions**: GET /public/directions?only_applied={bool}
+    - **Applications**: POST /directions/apply/:directionId, DELETE /directions/apply/:directionId, GET /apply-info/directions/:directionId
+    - **Tests**: POST /test/start, GET /test/questions/:attemptId, POST /test/submit
+    - **HR** (placeholders): POST /hr/applications/list, POST /hr/applications/status, POST /hr/applications/reject
+  - Mock data includes 3 directions with dynamic statuses and test questions
 
 ## Development Commands
 
@@ -159,11 +207,26 @@ bun add <package-name>
 ### Candidate App Structure
 ```
 apps/candidate-web/src/
-├── api/           # Candidate API layer
-├── storage/       # Candidate state management
-├── pages/         # Candidate pages (HomePage, RegisterPage, etc.)
-├── components/    # Candidate-specific components
-├── routes.tsx     # Candidate routes only
+├── api/
+│   ├── types/openapi.ts    # OpenAPI TypeScript interfaces
+│   ├── directionApi.ts     # Direction endpoints
+│   ├── testApi.ts          # Test flow endpoints
+│   └── baseApi.ts          # Axios configuration
+├── storage/
+│   ├── directionStorage.ts  # Direction state
+│   ├── applicationStorage.ts # Application state (apply info)
+│   ├── testStorage.ts       # Test state
+│   └── authStorage.ts       # Auth state
+├── pages/
+│   ├── HomePage/            # Directions list with filter
+│   ├── DirectionDetailPage/ # Direction info + apply form + test
+│   ├── TestPage/            # Test questions + results
+│   ├── MyApplicationsPage/  # User's applications + timelines
+│   ├── ProfilePage/         # User profile
+│   ├── LoginPage/           # Login form
+│   └── RegisterPage/        # Registration form
+├── components/              # Candidate-specific components
+├── routes.tsx               # Route definitions
 └── main.tsx
 ```
 
@@ -195,16 +258,23 @@ packages/ui-components/src/
 ## Key Differences Between Apps
 
 ### Candidate App
-- Routes: `/candidate/*`, `/login`, `/register`
-- Focus: Browse vacancies, apply, track applications
-- Pages: HomePage, VacancyDetailPage, MyApplicationsPage, ProfilePage
-- Users: Candidates with `role === 'candidate'`
+- Routes: `/candidate`, `/candidate/directions/:id`, `/candidate/test/:attemptId`, `/candidate/applications`, `/login`, `/register`
+- Focus: Browse directions, apply with resume URL, take tests, track applications
+- Key Features:
+  - Direction browsing with filter (show only applied)
+  - Apply to directions with resume URL input
+  - Dynamic application timeline based on DirectionStatusResponse[]
+  - Full test-taking flow with RadioGroup questions
+  - Test results display with score
+- Data: Works with DirectionResponse, ApplyInfoResponse, TestStartResponse
+- Users: Candidates with `authorities: [{ authority: 'ROLE_CANDIDATE' }]`
 
 ### Recruiter App
 - Routes: `/recruiter/*`, `/login`, `/register/recruiter`
 - Focus: View candidates, manage applications, hiring pipeline
 - Pages: RecruiterHomePage, CandidateDetailPage, VacancyApplicationsPage
-- Users: Recruiters with `role === 'recruiter'`
+- Users: Recruiters with `authorities: [{ authority: 'ROLE_RECRUITER' }]`
+- Note: Recruiter app requires migration to OpenAPI (not yet completed)
 
 ## Mock Service Worker (MSW)
 
@@ -236,6 +306,98 @@ cd apps/recruiter-web && bun run build
 # Changes automatically available to both apps (no rebuild needed in dev)
 ```
 
+## E2E Testing with Playwright
+
+### Test Location
+All Playwright e2e tests are in the shared `/frontend/e2e` folder:
+```
+e2e/
+├── setup/               # Auth setup files
+│   ├── candidate.setup.ts
+│   └── recruiter.setup.ts
+├── utils/              # Shared test helpers
+│   └── helpers.ts
+├── candidate/          # Candidate app tests (11 tests)
+└── recruiter/          # Recruiter app tests (8 tests)
+```
+
+### Running Tests
+
+**Candidate Tests**:
+```bash
+cd apps/candidate-web
+bunx playwright install        # First time only
+bun run e2e                   # Run all candidate tests
+bunx playwright test --ui     # Interactive UI mode
+bunx playwright test --debug  # Debug mode
+bunx playwright test candidate/auth.spec.ts  # Run specific file
+```
+
+**Recruiter Tests**:
+```bash
+cd apps/recruiter-web
+bun run e2e                   # Run all recruiter tests
+bunx playwright test --ui     # Interactive mode
+```
+
+### Test Data & Backend
+
+**Backend Requirements**:
+- Backend must be running at `localhost:8081`
+- Database must have seed data loaded
+
+**Seed Data Location**: `../backend/src/main/resources/db/changelog/mock-data/`
+
+**Test Users** (password: `password`):
+- Candidate: `user@example.com` (John Doe User)
+- HR/Recruiter: `hr@example.com` (Helen Hr Manager)
+- Admin: `admin@example.com` (Admin User Root)
+
+**Test Directions**:
+1. Junior Java Developer (ID: 1) - 80K-150K
+2. Middle Java Developer (ID: 2) - 150K-250K
+3. DevOps Engineer (ID: 3) - 160K-260K
+4. QA Automation Engineer (ID: 4) - 120K-200K
+
+**Test**: Universal test with 4 questions, max score 40, passing score 25
+
+### Writing New Tests
+
+1. **Use existing helpers** from `e2e/utils/helpers.ts`:
+   - `applyToDirection(page, directionId, resumeUrl, comment?)`
+   - `answerAllQuestions(page)`
+   - `waitForApiResponse(page, urlPattern)`
+
+2. **Idempotent patterns** - tests check state before acting:
+```typescript
+const alreadyApplied = await page.getByText(/вы уже откликнулись/i).isVisible();
+if (!alreadyApplied) {
+  // Apply logic
+}
+```
+
+3. **Place tests in correct folder**:
+   - Candidate tests → `e2e/candidate/`
+   - Recruiter tests → `e2e/recruiter/`
+
+4. **Auth is automatic** - tests use stored auth state from setup files
+
+### Database Information
+
+**Location**: `../backend/src/main/resources/db/`
+- `changelog/` - Liquibase migration files
+- `changelog/mock-data/` - Seed data for testing
+
+**Key Tables**:
+- `users` - Test users with bcrypt passwords
+- `directions` - Job vacancies
+- `direction_statuses` - Application pipeline stages
+- `tests`, `questions`, `answer_options` - Test questions
+- `applications` - User applications to directions
+- `test_attempts` - Test attempts and scores
+
+All entity IDs are **numbers** (not strings).
+
 ## Troubleshooting
 
 ### Workspace Not Linked
@@ -254,6 +416,13 @@ bun install
 - For shared components: changes should reflect immediately in dev mode
 - For app-specific: check you edited the right app
 
+### Playwright Tests Failing
+- Ensure backend is running at `localhost:8081`
+- Check database has seed data loaded
+- Run setup first: `bunx playwright test --project=candidate-setup`
+- Clear auth state: `rm -rf e2e/.auth/`
+- Check Playwright config points to correct testDir: `../../e2e`
+
 ## Best Practices
 
 1. **Shared Components**: Only share truly role-agnostic UI components
@@ -261,7 +430,8 @@ bun install
 3. **Import Aliases**: Use `@shared/ui/*` for shared components, relative paths within apps
 4. **Documentation**: Update CLAUDE.md files when adding major features
 5. **Testing**: Test both apps after changing shared components
-6. **Commit Organization**: Group changes by app or shared package
+6. **E2E Tests**: Write idempotent tests that handle existing data gracefully
+7. **Commit Organization**: Group changes by app or shared package
 
 ## Further Reading
 

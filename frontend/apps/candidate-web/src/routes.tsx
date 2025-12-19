@@ -4,8 +4,9 @@ import HomePage from './pages/HomePage/HomePage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
-import VacancyDetailPage from './pages/VacancyDetailPage/VacancyDetailPage';
+import DirectionDetailPage from './pages/DirectionDetailPage/DirectionDetailPage';
 import MyApplicationsPage from './pages/MyApplicationsPage/MyApplicationsPage';
+import TestPage from './pages/TestPage/TestPage';
 import { useAuthStore } from './storage/authStorage';
 
 // Root path loader - redirects to candidate routes
@@ -43,7 +44,7 @@ export const router = createBrowserRouter([
         element: <RegisterPage />,
       },
 
-      // Candidate routes (public vacancy browsing, protected personal features)
+      // Candidate routes (public direction browsing, protected personal features)
       {
         path: '/candidate',
         children: [
@@ -52,8 +53,13 @@ export const router = createBrowserRouter([
             element: <HomePage />,
           },
           {
-            path: 'vacancies/:id',
-            element: <VacancyDetailPage />,
+            path: 'directions/:id',
+            element: <DirectionDetailPage />,
+          },
+          {
+            path: 'test/:attemptId',
+            element: <TestPage />,
+            loader: candidateProtectedLoader,
           },
           {
             path: 'applications',

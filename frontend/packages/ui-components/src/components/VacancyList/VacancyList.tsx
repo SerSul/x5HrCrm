@@ -1,19 +1,30 @@
 import { Card, Spin, Button, Text, Label } from '@gravity-ui/uikit';
-import type { Vacancy } from '../../types/vacancy';
 import styles from './VacancyList.module.scss';
 
+// Direction type matching OpenAPI DirectionResponse
+export interface Direction {
+  id: number;
+  title: string;
+  description: string;
+  employment_type: string;
+  salary_min: number;
+  salary_max: number;
+  active: boolean;
+  created_at: string;
+  closed_at?: string;
+  test_id?: number;
+  statuses: any[];
+  applied?: boolean;
+}
+
 interface VacancyListProps {
-  // Data props
-  vacancies: Vacancy[];
+  // Data props - now uses Direction (previously Vacancy)
+  vacancies: Direction[];
   loading?: boolean;
   error?: string | null;
 
-  // Existing props
-  appliedVacancyIds?: string[];
-  showAppliedOnly?: boolean;
-
-  // Callback for navigation
-  onVacancyClick: (vacancyId: string) => void;
+  // Callback for navigation - now accepts number ID
+  onVacancyClick: (directionId: number) => void;
 
   // Optional customization
   title?: string;
@@ -26,8 +37,6 @@ const VacancyList = ({
   vacancies,
   loading = false,
   error = null,
-  appliedVacancyIds = [],
-  showAppliedOnly = false,
   onVacancyClick,
   title,
   emptyStateMessage,
@@ -51,69 +60,76 @@ const VacancyList = ({
     );
   }
 
-  const filteredVacancies = showAppliedOnly
-    ? vacancies.filter((vacancy) => appliedVacancyIds.includes(vacancy.id))
-    : vacancies;
+  const displayTitle = title || 'Доступные направления';
+  const displayEmptyMessage = emptyStateMessage || 'Нет доступных направлений';
 
-  const displayTitle = title || (showAppliedOnly ? 'Вакансии с моими откликами' : 'Доступные вакансии');
-
-  const displayEmptyMessage = emptyStateMessage || (() => {
-    if (showAppliedOnly) {
-      return appliedVacancyIds.length === 0
-        ? 'У вас нет откликов'
-        : 'Не найдено вакансий с откликами';
-    }
-    return 'Нет доступных вакансий';
-  })();
+  // Employment type translation
+  const employmentTypeMap: Record<string, string> = {
+    FULL_TIME: 'Полная занятость',
+    PART_TIME: 'Частичная занятость',
+    CONTRACT: 'Контракт',
+    INTERNSHIP: 'Стажировка',
+    REMOTE: 'Удаленная работа',
+    FREELANCE: 'Фриланс',
+  };
 
   return (
     <div className={`${styles.container} ${className}`}>
       <Text variant="display-1" className={styles.title}>
         {displayTitle}
       </Text>
-      {filteredVacancies.length === 0 ? (
+      {vacancies.length === 0 ? (
         <Text variant="body-1" className={styles.emptyState}>{displayEmptyMessage}</Text>
       ) : (
         <div className={styles.grid}>
-          {filteredVacancies.map((vacancy) => {
-            const isApplied = appliedVacancyIds.includes(vacancy.id);
+          {vacancies.map((direction) => {
+            const employmentType = employmentTypeMap[direction.employment_type] || direction.employment_type;
+            const salaryRange = direction.salary_min && direction.salary_max
+              ? `${direction.salary_min.toLocaleString()} - ${direction.salary_max.toLocaleString()} ₽`
+              : 'Не указана';
 
             return (
-              <div key={vacancy.id} className={styles.cardWrapper}>
+              <div key={direction.id} className={styles.cardWrapper}>
                 <Card view="outlined" className={styles.card}>
-                  {isApplied && (
+                  {direction.applied && (
                     <div className={styles.appliedBadge}>
                       <Label theme="info" size="s">
                         Откликнулись
                       </Label>
                     </div>
                   )}
+                  {!direction.active && (
+                    <div className={styles.appliedBadge}>
+                      <Label theme="danger" size="s">
+                        Закрыта
+                      </Label>
+                    </div>
+                  )}
+                  {direction.test_id && (
+                    <div className={styles.testBadge}>
+                      <Label theme="warning" size="s">
+                        📝 Тест
+                      </Label>
+                    </div>
+                  )}
                   <div className={styles.cardContent}>
-                    <Text variant="header-2" className={styles.vacancyTitle}>{vacancy.title}</Text>
+                    <Text variant="header-2" className={styles.vacancyTitle}>{direction.title}</Text>
                     <div className={styles.vacancyMeta}>
                       <div className={styles.metaItem}>
-                        <Text variant="subheader-1" color="secondary" as="span">Компания:</Text>{' '}
-                        <Text variant="body-2" as="span">{vacancy.company}</Text>
-                      </div>
-                      <div className={styles.metaItem}>
-                        <Text variant="subheader-1" color="secondary" as="span">Местоположение:</Text>{' '}
-                        <Text variant="body-2" as="span">{vacancy.location}</Text>
-                      </div>
-                      <div className={styles.metaItem}>
                         <Text variant="subheader-1" color="secondary" as="span">Тип занятости:</Text>{' '}
-                        <Text variant="body-2" as="span">{vacancy.type}</Text>
+                        <Text variant="body-2" as="span">{employmentType}</Text>
                       </div>
                       <div className={styles.metaItem}>
                         <Text variant="subheader-1" color="secondary" as="span">Зарплата:</Text>{' '}
-                        <Text variant="body-2" as="span">{vacancy.salary}</Text>
+                        <Text variant="body-2" as="span">{salaryRange}</Text>
                       </div>
                     </div>
-                    <Text variant="body-1" className={styles.description}>{vacancy.description}</Text>
+                    <Text variant="body-1" className={styles.description}>{direction.description}</Text>
                     <div className={styles.cardActions}>
                       <Button
                         view="action"
                         width="max"
-                        onClick={() => onVacancyClick(vacancy.id)}
+                        onClick={() => onVacancyClick(direction.id)}
                       >
                         {buttonText}
                       </Button>

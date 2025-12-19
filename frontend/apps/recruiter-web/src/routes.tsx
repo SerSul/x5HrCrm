@@ -3,9 +3,7 @@ import RecruiterLayout from './layouts/RecruiterLayout';
 import LoginPage from './pages/LoginPage/LoginPage';
 import RecruiterRegisterPage from './pages/RecruiterRegisterPage/RecruiterRegisterPage';
 import RecruiterHomePage from './pages/RecruiterHomePage/RecruiterHomePage';
-import CandidateDetailPage from './pages/CandidateDetailPage/CandidateDetailPage';
-import VacancyApplicationsPage from './pages/VacancyApplicationsPage/VacancyApplicationsPage';
-import VacancyDetailPage from './pages/VacancyDetailPage/VacancyDetailPage';
+import DirectionApplicationsPage from './pages/DirectionApplicationsPage/DirectionApplicationsPage';
 import { useAuthStore } from './storage/authStorage';
 
 // Root path loader - redirects to recruiter routes
@@ -64,16 +62,8 @@ export const router = createBrowserRouter([
             element: <RecruiterHomePage />,
           },
           {
-            path: 'candidates/:id',
-            element: <CandidateDetailPage />,
-          },
-          {
-            path: 'vacancies/:id',
-            element: <VacancyDetailPage />,
-          },
-          {
-            path: 'vacancies/:id/applications',
-            element: <VacancyApplicationsPage />,
+            path: 'directions/:directionId/applications',
+            element: <DirectionApplicationsPage />,
           },
         ],
       },

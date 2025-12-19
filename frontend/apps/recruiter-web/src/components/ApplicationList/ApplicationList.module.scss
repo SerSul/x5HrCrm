@@ -1,0 +1,50 @@
+.container {
+  padding: 2rem;
+}
+
+.title {
+  margin-bottom: 1.5rem;
+}
+
+.filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filterInput {
+  flex: 1;
+  min-width: 250px;
+}
+
+.filterSelect {
+  min-width: 200px;
+}
+
+.tableWrapper {
+  border: 1px solid var(--g-color-line-generic);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.paginationWrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem;
+}
+
+.emptyText {
+  text-align: center;
+  padding: 2rem;
+  color: var(--g-color-text-secondary);
+}

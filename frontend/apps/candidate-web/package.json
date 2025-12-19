@@ -7,9 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "e2e": "bunx playwright test",
-    "e2e:install": "bunx playwright install"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@gravity-ui/icons": "^2.16.0",
@@ -23,7 +21,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@playwright/test": "^1.57.0",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",

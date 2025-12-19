@@ -1,46 +1,40 @@
 import { Label } from '@gravity-ui/uikit';
-import type { ApplicationStage } from '../../types/application';
 
 interface ApplicationStatusBadgeProps {
-  status: ApplicationStage | 'pending' | 'reviewed' | 'accepted' | 'rejected';
+  status: string; // Now accepts any status title string
+  closeReason?: string; // Optional close reason for rejected applications
 }
 
-const ApplicationStatusBadge = ({ status }: ApplicationStatusBadgeProps) => {
-  const themeMap: Record<string, 'warning' | 'info' | 'success' | 'danger' | 'utility'> = {
-    // Old statuses (for backward compatibility)
-    pending: 'warning',
-    reviewed: 'info',
-    accepted: 'success',
-    rejected: 'danger',
-    // New stages
-    applied: 'warning',
-    screening: 'info',
-    phone: 'info',
-    technical: 'info',
-    final: 'info',
-    offer: 'utility',
-    hired: 'success',
+const ApplicationStatusBadge = ({ status, closeReason }: ApplicationStatusBadgeProps) => {
+  // Determine theme based on status title keywords
+  const getTheme = (statusTitle: string): 'warning' | 'info' | 'success' | 'danger' | 'utility' => {
+    const lower = statusTitle.toLowerCase();
+
+    // Success states
+    if (lower.includes('нанят') || lower.includes('hired') || lower.includes('оффер') || lower.includes('offer')) {
+      return 'success';
+    }
+
+    // Danger/rejected states
+    if (lower.includes('отклон') || lower.includes('reject') || lower.includes('закрыт') || lower.includes('отказ')) {
+      return 'danger';
+    }
+
+    // Warning states (initial/waiting)
+    if (lower.includes('нова') || lower.includes('new') || lower.includes('ожидан') || lower.includes('waiting')) {
+      return 'warning';
+    }
+
+    // Default to info for intermediate statuses
+    return 'info';
   };
 
-  const labelMap: Record<string, string> = {
-    // Old statuses
-    pending: 'На рассмотрении',
-    reviewed: 'Просмотрено',
-    accepted: 'Принято',
-    rejected: 'Отклонено',
-    // New stages
-    applied: 'Подано',
-    screening: 'Скрининг',
-    phone: 'Телефон',
-    technical: 'Техническое',
-    final: 'Финальное',
-    offer: 'Оффер',
-    hired: 'Нанят',
-  };
+  const theme = getTheme(status);
+  const displayText = closeReason ? `${status} (${closeReason})` : status;
 
   return (
-    <Label theme={themeMap[status] || 'info'} size="s">
-      {labelMap[status] || status}
+    <Label theme={theme} size="s">
+      {displayText}
     </Label>
   );
 };

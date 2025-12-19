@@ -4,66 +4,58 @@ import { Button } from '@gravity-ui/uikit';
 import { ListUl } from '@gravity-ui/icons';
 import VacancyList from '@shared/ui/components/VacancyList/VacancyList';
 import ApplicationSidebar from '../../components/ApplicationSidebar/ApplicationSidebar';
-import { useApplicationStore } from '../../storage/applicationStorage';
-import { useVacancyStore } from '../../storage/vacancyStorage';
-import type { Application } from '../../api/applicationApi';
+import { useDirectionStore } from '../../storage/directionStorage';
 import styles from './HomePage.module.scss';
 
 const HomePage = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [showAppliedOnly, setShowAppliedOnly] = useState(false);
-  const [selectedVacancyId, setSelectedVacancyId] = useState<string>();
+  const [selectedDirectionId, setSelectedDirectionId] = useState<number>();
 
   const navigate = useNavigate();
-  const { applications, loading, fetchMyApplications } = useApplicationStore();
-  const { vacancies, loading: vacanciesLoading, error: vacanciesError, fetchVacancies } = useVacancyStore();
+  const { directions, loading, error, fetchDirections } = useDirectionStore();
 
   useEffect(() => {
-    fetchMyApplications();
-  }, [fetchMyApplications]);
-
-  useEffect(() => {
-    fetchVacancies();
-  }, [fetchVacancies]);
+    fetchDirections(showAppliedOnly);
+  }, [fetchDirections, showAppliedOnly]);
 
   const handleToggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
-  const handleApplicationClick = (vacancyId: string) => {
-    setSelectedVacancyId(vacancyId);
+  const handleApplicationClick = (directionId: number) => {
+    setSelectedDirectionId(directionId);
   };
 
   const handleFilterToggle = (checked: boolean) => {
     setShowAppliedOnly(checked);
   };
 
-  const handleVacancyClick = (vacancyId: string) => {
-    navigate(`/candidate/vacancies/${vacancyId}`);
+  const handleVacancyClick = (directionId: number) => {
+    navigate(`/candidate/directions/${directionId}`);
   };
 
-  const appliedVacancyIds = applications.map((app: Application) => app.vacancyId);
+  // Get directions where user has applied
+  const appliedDirections = directions.filter(d => d.applied);
 
   return (
     <div className={styles.homePage}>
       <ApplicationSidebar
-        applications={applications}
+        applications={appliedDirections}
         loading={loading}
         isCollapsed={sidebarCollapsed}
         onToggle={handleToggleSidebar}
         onApplicationClick={handleApplicationClick}
-        selectedVacancyId={selectedVacancyId}
+        selectedVacancyId={selectedDirectionId}
         onFilterToggle={handleFilterToggle}
         showAppliedOnly={showAppliedOnly}
       />
 
       <div className={styles.mainContent}>
         <VacancyList
-          vacancies={vacancies}
-          loading={vacanciesLoading}
-          error={vacanciesError}
-          appliedVacancyIds={appliedVacancyIds}
-          showAppliedOnly={showAppliedOnly}
+          vacancies={directions}
+          loading={loading}
+          error={error}
           onVacancyClick={handleVacancyClick}
         />
       </div>

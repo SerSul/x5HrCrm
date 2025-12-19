@@ -1,52 +1,89 @@
 import { create } from 'zustand';
 import {
-  applyToVacancyRequest,
-  fetchMyApplicationsRequest,
-  fetchVacancyApplicationsRequest,
-  updateApplicationStatusRequest,
-  updateApplicationStageRequest,
-  type Application,
-  type ApplicationStage,
-} from '../api/applicationApi';
+  fetchDirectionsRequest,
+  fetchApplicationsListRequest,
+  moveApplicationStatusRequest,
+  rejectApplicationRequest,
+  fetchApplyInfoRequest,
+} from '../api/hrApi';
+import type {
+  DirectionResponse,
+  ApplicationHrItem,
+  ApplicationFilterDto,
+  MoveApplicationStatusRequest,
+  RejectApplicationRequest,
+  ApplyInfoResponse,
+} from '../api/types/openapi';
 
 interface ApplicationState {
-  applications: Application[];
+  // Directions (HR view)
+  directions: DirectionResponse[];
+
+  // Applications (paginated HR view)
+  applications: ApplicationHrItem[];
+  currentPage: number;
+  pageSize: number;
+  totalApplications: number;
+  totalPages: number;
+
+  // Application details (for detail view)
+  selectedApplicationDetails: ApplyInfoResponse | null;
+
+  // UI state
   loading: boolean;
   error: string | null;
-  applyToVacancy: (vacancyId: string) => Promise<void>;
-  fetchMyApplications: () => Promise<void>;
-  fetchVacancyApplications: (vacancyId: string) => Promise<void>;
-  updateApplicationStatus: (id: string, status: string) => Promise<void>;
-  updateApplicationStage: (id: string, stage: ApplicationStage, note?: string) => Promise<void>;
-  getApplicationByVacancyId: (vacancyId: string) => Application | undefined;
+
+  // Actions
+  fetchDirections: () => Promise<void>;
+  fetchApplications: (filters: ApplicationFilterDto) => Promise<void>;
+  moveApplicationStatus: (data: MoveApplicationStatusRequest) => Promise<void>;
+  rejectApplication: (data: RejectApplicationRequest) => Promise<void>;
+  fetchApplicationDetails: (directionId: number, userId: number) => Promise<void>;
+
+  // Helpers
+  getApplicationsByDirection: (directionId: number) => ApplicationHrItem[];
+  getDirectionById: (directionId: number) => DirectionResponse | undefined;
+  setCurrentPage: (page: number) => void;
+  setPageSize: (size: number) => void;
+  clearError: () => void;
 }
 
-export const useApplicationStore = create<ApplicationState>()((set) => ({
+export const useApplicationStore = create<ApplicationState>()((set, get) => ({
+  directions: [],
   applications: [],
+  currentPage: 1,
+  pageSize: 20,
+  totalApplications: 0,
+  totalPages: 0,
+  selectedApplicationDetails: null,
   loading: false,
   error: null,
 
-  applyToVacancy: async (vacancyId: string) => {
+  fetchDirections: async () => {
     set({ loading: true, error: null });
     try {
-      const res = await applyToVacancyRequest(vacancyId);
-      set((state) => ({
-        applications: [...state.applications, res.data],
-        loading: false,
-      }));
+      const res = await fetchDirectionsRequest();
+      set({ directions: res.data, loading: false });
     } catch (error: any) {
       set({
-        error: error?.response?.data?.message || 'Failed to apply to vacancy',
+        error: error?.response?.data?.message || 'Failed to fetch directions',
         loading: false,
       });
     }
   },
 
-  fetchMyApplications: async () => {
+  fetchApplications: async (filters: ApplicationFilterDto) => {
     set({ loading: true, error: null });
     try {
-      const res = await fetchMyApplicationsRequest();
-      set({ applications: res.data, loading: false });
+      const res = await fetchApplicationsListRequest(filters);
+      set({
+        applications: res.data.items,
+        totalApplications: res.data.total,
+        currentPage: res.data.page,
+        pageSize: res.data.size,
+        totalPages: res.data.total_pages,
+        loading: false,
+      });
     } catch (error: any) {
       set({
         error: error?.response?.data?.message || 'Failed to fetch applications',
@@ -55,29 +92,14 @@ export const useApplicationStore = create<ApplicationState>()((set) => ({
     }
   },
 
-  fetchVacancyApplications: async (vacancyId: string) => {
+  moveApplicationStatus: async (data: MoveApplicationStatusRequest) => {
     set({ loading: true, error: null });
     try {
-      const res = await fetchVacancyApplicationsRequest(vacancyId);
-      set({ applications: res.data, loading: false });
-    } catch (error: any) {
-      set({
-        error: error?.response?.data?.message || 'Failed to fetch vacancy applications',
-        loading: false,
-      });
-    }
-  },
-
-  updateApplicationStatus: async (id: string, status: string) => {
-    set({ loading: true, error: null });
-    try {
-      const res = await updateApplicationStatusRequest(id, status);
-      set((state) => ({
-        applications: state.applications.map((app) =>
-          app.id === id ? res.data : app
-        ),
-        loading: false,
-      }));
+      await moveApplicationStatusRequest(data);
+      // Refresh current applications list after status change
+      const { currentPage, pageSize } = get();
+      await get().fetchApplications({ page: currentPage, size: pageSize });
+      set({ loading: false });
     } catch (error: any) {
       set({
         error: error?.response?.data?.message || 'Failed to update application status',
@@ -86,26 +108,52 @@ export const useApplicationStore = create<ApplicationState>()((set) => ({
     }
   },
 
-  updateApplicationStage: async (id: string, stage: ApplicationStage, note?: string) => {
+  rejectApplication: async (data: RejectApplicationRequest) => {
     set({ loading: true, error: null });
     try {
-      const res = await updateApplicationStageRequest(id, stage, note);
+      await rejectApplicationRequest(data);
+      // Remove from applications list (or re-fetch)
       set((state) => ({
-        applications: state.applications.map((app) =>
-          app.id === id ? res.data : app
+        applications: state.applications.filter(
+          (app) => app.application_id !== data.application_id
         ),
         loading: false,
       }));
     } catch (error: any) {
       set({
-        error: error?.response?.data?.message || 'Failed to update application stage',
+        error: error?.response?.data?.message || 'Failed to reject application',
         loading: false,
       });
     }
   },
 
-  getApplicationByVacancyId: (vacancyId: string): Application | undefined => {
-    const state: ApplicationState = useApplicationStore.getState();
-    return state.applications.find((app: Application) => app.vacancyId === vacancyId);
+  fetchApplicationDetails: async (directionId: number, userId: number) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetchApplyInfoRequest(directionId, userId);
+      set({
+        selectedApplicationDetails: res.data,
+        loading: false,
+      });
+    } catch (error: any) {
+      set({
+        error: error?.response?.data?.message || 'Failed to fetch application details',
+        loading: false,
+      });
+    }
   },
+
+  getApplicationsByDirection: (directionId: number) => {
+    const { applications } = get();
+    return applications.filter((app) => app.direction_id === directionId);
+  },
+
+  getDirectionById: (directionId: number) => {
+    const { directions } = get();
+    return directions.find((d) => d.id === directionId);
+  },
+
+  setCurrentPage: (page: number) => set({ currentPage: page }),
+  setPageSize: (size: number) => set({ pageSize: size }),
+  clearError: () => set({ error: null }),
 }));

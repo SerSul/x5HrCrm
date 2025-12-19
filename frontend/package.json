@@ -1,8 +1,18 @@
 {
   "name": "x5-bootcamp",
   "private": true,
-  "workspaces": ["packages/*", "apps/*"],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "e2e": "bunx playwright test",
+    "e2e:install": "bunx playwright install",
+    "dev:recruiter": "cd apps/recruiter-web && bun run dev",
+    "dev:candidate": "cd apps/candidate-web && bun run dev"
+  },
   "devDependencies": {
-    "msw": "^2.12.4"
+    "msw": "^2.12.4",
+    "@playwright/test": "^1.57.0"
   }
 }

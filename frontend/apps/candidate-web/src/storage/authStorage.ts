@@ -113,15 +113,12 @@ export const useAuthStore = create<AuthState>()((set) => ({
   },
 
   restoreSession: async () => {
-    if (!localStorage.getItem('hasSession')) {
-      return;
-    }
-
     set({ loading: true, error: null });
     try {
       const userInfoRes = await getCurrentUserRequest();
       const user = mapUserInfoToUser(userInfoRes.data);
       set({ user, loading: false });
+      localStorage.setItem('hasSession', 'true');
     } catch (error) {
       set({ user: null, loading: false });
       localStorage.removeItem('hasSession');
